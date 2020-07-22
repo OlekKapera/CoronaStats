@@ -1,16 +1,14 @@
 package com.example.covidstats.viewmodel
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import com.example.covidstats.repository.StatsRepository
 import com.example.covidstats.room.getDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import com.example.covidstats.ui.MainFragment
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
 /**
@@ -24,6 +22,10 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
     private val database = getDatabase(application)
     private val repository = StatsRepository(database)
 
+    private val _exceptionCaughtEvent = MutableLiveData<Boolean>()
+    val exceptionCaughtEvent: LiveData<Boolean>
+        get() = _exceptionCaughtEvent
+
     val statistics = repository.stats
     val statisticsText = Transformations.map(statistics) { stats ->
         var newText = ""
@@ -35,13 +37,32 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
 
     init {
         scope.launch {
-            repository.getStats()
+            try {
+                repository.getStats()
+            } catch (e: Exception) {
+                engageExceptionAction()
+            }
         }
     }
 
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
+    }
+
+    /**
+     * Is being called when network related exception is called and changed liveData's value for
+     * further handling
+     */
+    private fun engageExceptionAction() {
+        _exceptionCaughtEvent.value = true
+    }
+
+    /**
+     * Resets exception event after it was handled
+     */
+    fun exceptionHandled() {
+        _exceptionCaughtEvent.value = false
     }
 
     class MainFragmentViewModelFactory(private val application: Application) :

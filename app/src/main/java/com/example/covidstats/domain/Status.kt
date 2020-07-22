@@ -15,8 +15,7 @@ data class Status(
     val date: DateTime
 ) {
     override fun toString(): String {
-        return """countryName = $countryName\tcountryCode = $countryCode\tlat = $latitude\t
-long = $longitude\tcases = $cases\tstatus = ${status.value}\tdate = ${date.toString()}\n\n"""
+        return "countryName = $countryName | countryCode = $countryCode | lat = $latitude | long = $longitude | cases = $cases | status = ${status.value} | date = ${date.toString()}\n\n"
     }
 }
 

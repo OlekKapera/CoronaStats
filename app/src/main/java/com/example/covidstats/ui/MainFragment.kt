@@ -7,10 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.covidstats.R
 import com.example.covidstats.databinding.FragmentMainBinding
 import com.example.covidstats.viewmodel.MainFragmentViewModel
+import com.google.android.material.snackbar.Snackbar
 
 class MainFragment : Fragment() {
 
@@ -36,6 +38,17 @@ class MainFragment : Fragment() {
         )
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
+
+        viewModel.exceptionCaughtEvent.observe(viewLifecycleOwner, Observer { isExceptionCaught ->
+            if (isExceptionCaught) {
+                Snackbar.make(
+                    binding.root,
+                    R.string.exception_fetch_statistics,
+                    Snackbar.LENGTH_SHORT
+                ).show()
+                viewModel.exceptionHandled()
+            }
+        })
 
         return binding.root
     }
