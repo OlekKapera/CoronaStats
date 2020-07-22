@@ -1,7 +1,8 @@
-package com.example.covidstats
+package com.example.covidstats.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.covidstats.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

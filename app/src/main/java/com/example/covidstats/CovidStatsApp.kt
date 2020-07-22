@@ -1,0 +1,13 @@
+package com.example.covidstats
+
+import android.app.Application
+
+/**
+ * Sets up background tasks with work manager
+ */
+class CovidStatsApp: Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+    }
+}
