@@ -11,9 +11,9 @@ import com.example.covidstats.domain.Country
 data class CountryTable(
 
     @PrimaryKey
+    val iso2: String,
     val slug: String,
-    val countryName: String,
-    val iso2: String
+    val countryName: String
 )
 
 /**

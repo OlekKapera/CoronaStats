@@ -18,5 +18,5 @@ object CovidService {
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
         .build()
 
-    val service = retrofit.create(CovidService::class.java)
+    val service = retrofit.create(CovidServiceAPI::class.java)
 }
