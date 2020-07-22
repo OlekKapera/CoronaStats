@@ -73,4 +73,7 @@ dependencies {
 
     // WorkManager
     implementation "android.arch.work:work-runtime-ktx:$version_work"
+
+    // Joda
+    implementation 'net.danlew:android.joda:2.10.6'
 }

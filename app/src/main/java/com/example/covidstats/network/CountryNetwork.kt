@@ -31,12 +31,12 @@ fun List<CountryNetwork>.asDomainModel(): List<Country> {
 /**
  * Converts [CountryNetwork] to [CountryTable]
  */
-fun List<CountryNetwork>.asDatabaseModel(): List<CountryTable> {
+fun List<CountryNetwork>.asDatabaseModel(): Array<CountryTable> {
     return map {
         CountryTable(
             countryName = it.country,
             slug = it.slug,
             iso2 = it.iso2
         )
-    }
+    }.toTypedArray()
 }
