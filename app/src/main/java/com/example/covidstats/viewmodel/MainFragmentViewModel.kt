@@ -2,6 +2,7 @@ package com.example.covidstats.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.covidstats.repository.StatsRepository
@@ -10,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import com.example.covidstats.ui.MainFragment
+import kotlinx.coroutines.launch
 
 /**
  * ViewModel for [MainFragment]
@@ -21,6 +23,26 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
 
     private val database = getDatabase(application)
     private val repository = StatsRepository(database)
+
+    val statistics = repository.stats
+    val statisticsText = Transformations.map(statistics) { stats ->
+        var newText = ""
+        stats.forEach { statistic ->
+            newText += statistic.toString()
+        }
+        newText
+    }
+
+    init {
+        scope.launch {
+            repository.getStats()
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+    }
 
     class MainFragmentViewModelFactory(private val application: Application) :
         ViewModelProvider.Factory {

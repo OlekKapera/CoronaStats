@@ -13,7 +13,12 @@ data class Status(
     val cases: Long,
     val status: StatusEnum,
     val date: DateTime
-)
+) {
+    override fun toString(): String {
+        return """countryName = $countryName\tcountryCode = $countryCode\tlat = $latitude\t
+long = $longitude\tcases = $cases\tstatus = ${status.value}\tdate = ${date.toString()}\n\n"""
+    }
+}
 
 enum class StatusEnum(val value: String) {
     RECOVERED("recovered"),

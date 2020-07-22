@@ -3,6 +3,7 @@ package com.example.covidstats.network
 import com.example.covidstats.domain.Status
 import com.example.covidstats.domain.StatusEnum
 import com.example.covidstats.room.StatusTable
+import com.example.covidstats.util.DateConverter
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import org.joda.time.DateTime
@@ -33,8 +34,8 @@ fun List<StatusNetwork>.asDomainModel(): List<Status> {
             latitude = it.latitude,
             longitude = it.longitude,
             cases = it.cases,
-            status = StatusEnum.valueOf(it.status),
-            date = DateTime.parse(it.date, ISODateTimeFormat.dateTime())
+            status = StatusEnum.valueOf(it.status.toUpperCase()),
+            date = DateTime.parse(it.date, DateConverter)
         )
     }
 }
@@ -48,7 +49,7 @@ fun List<StatusNetwork>.asDatabaseModel(): Array<StatusTable> {
             longitude = it.longitude,
             cases = it.cases,
             status = it.status,
-            date = DateTime.parse(it.date, ISODateTimeFormat.dateTime()).millis
+            date = DateTime.parse(it.date, DateConverter).millis
         )
     }.toTypedArray()
 }

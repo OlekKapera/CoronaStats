@@ -35,7 +35,7 @@ fun List<StatusTable>.asDomainModel(): List<Status> {
             latitude = it.latitude,
             longitude = it.longitude,
             cases = it.cases,
-            status = StatusEnum.valueOf(it.status),
+            status = StatusEnum.valueOf(it.status.toUpperCase()),
             date = DateTime(it.date)
         )
     }

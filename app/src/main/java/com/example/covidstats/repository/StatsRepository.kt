@@ -21,20 +21,24 @@ class StatsRepository(private val database: StatsDatabase) {
             it.asDomainModel()
         }
 
-    suspend fun getStats(countryCodes: List<String>, statuses: List<StatusEnum>) {
+    suspend fun getStats(
+        countryCodes: List<String>? = listOf("US"),
+        statuses: List<StatusEnum>? = listOf(StatusEnum.CONFIRMED)
+    ) {
         withContext(Dispatchers.IO) {
             val deferredStats: MutableList<Deferred<List<StatusNetwork>>> = mutableListOf()
             var newStats: List<List<StatusNetwork>> = mutableListOf()
 
-            countryCodes.forEach { code ->
-                statuses.forEach { status ->
+            countryCodes?.forEach { code ->
+                statuses?.forEach { status ->
                     deferredStats.add(CovidService.service.getDayOneByStatus(code, status.value))
                 }
             }
             newStats = deferredStats.awaitAll()
             database.statsDao.deleteAllStats()
             newStats.forEach { statistic ->
-                database.statsDao.insertStatistic(*statistic.asDatabaseModel())
+                //TODO delete sublist
+                database.statsDao.insertStatistic(*statistic.subList(0,1000).asDatabaseModel())
             }
         }
     }
