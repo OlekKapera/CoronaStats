@@ -1,6 +1,7 @@
 package com.example.covidstats.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.example.covidstats.repository.StatsRepository
 import com.example.covidstats.room.getDatabase
@@ -41,6 +42,7 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
                 repository.getStats()
             } catch (e: Exception) {
                 engageExceptionAction()
+                Log.e(this.javaClass.simpleName, e.message)
             }
         }
     }
