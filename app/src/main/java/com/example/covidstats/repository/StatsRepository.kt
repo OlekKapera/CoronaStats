@@ -10,11 +10,13 @@ import com.example.covidstats.network.asDatabaseModel
 import com.example.covidstats.room.StatsDatabase
 import com.example.covidstats.room.asDomainModel
 import com.example.covidstats.util.DateConverter
+import com.example.covidstats.util.replaceZoneString
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 
 class StatsRepository(private val database: StatsDatabase) {
 
@@ -61,10 +63,19 @@ class StatsRepository(private val database: StatsDatabase) {
     suspend fun updateTodayStats(country: Country) {
         withContext(Dispatchers.IO) {
             val now = DateTime.now()
+                .toDateTime(DateTimeZone.UTC)
+                .withHourOfDay(0)
+                .withMinuteOfHour(0)
+                .withSecondOfMinute(0)
+                .withMillisOfDay(0)
+
+            val yesterday = now.minusDays(1).toString(DateConverter).replaceZoneString()
+            val nowStr = now.toString(DateConverter).replaceZoneString()
+
             val newStats = CovidService.service.getStatsByTime(
                 country.slug,
-                now.minusDays(1).toString(DateConverter),
-                now.toString(DateConverter)
+                yesterday,
+                nowStr
             ).await()
             database.statsDao.insertStatistic(*newStats.asDatabaseModel())
         }
