@@ -7,7 +7,7 @@
 
 ## Technology
 * Kotlin
-* Kotlin Coroutins
+* Kotlin Coroutines
 * Room
 * MVVM
 * Retrofit
