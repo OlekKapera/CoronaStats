@@ -6,18 +6,15 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface CovidServiceAPI {
-    @GET("dayone/country/{country}/status/{status}")
-    fun getDayOneByStatus(
-        @Path("country") country: String,
-        @Path("status") status: String
-    ): Deferred<List<StatisticNetwork>>
+    @GET("dayone/country/{country}")
+    fun getDayOneAllStatus(@Path("country") country: String): Deferred<List<AllStatusStatisticNetwork>>
 
     @GET("country/{country}")
     fun getStatsByTime(
         @Path("country") countrySlug: String,
         @Query("from") fromDate: String,
         @Query("to") toDate: String
-    ): Deferred<List<StatisticNetwork>>
+    ): Deferred<List<AllStatusStatisticNetwork>>
 
     @GET("countries")
     fun getAllCountries(): Deferred<List<CountryNetwork>>

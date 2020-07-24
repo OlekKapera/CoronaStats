@@ -2,11 +2,10 @@ package com.example.covidstats.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.example.covidstats.domain.AllStatusStatistic
 import com.example.covidstats.domain.Country
-import com.example.covidstats.domain.Statistic
-import com.example.covidstats.domain.StatusEnum
+import com.example.covidstats.network.AllStatusStatisticNetwork
 import com.example.covidstats.network.CovidService
-import com.example.covidstats.network.StatisticNetwork
 import com.example.covidstats.network.asDatabaseModel
 import com.example.covidstats.room.StatsDatabase
 import com.example.covidstats.room.asDomainModel
@@ -19,9 +18,9 @@ import org.joda.time.DateTime
 
 class StatsRepository(private val database: StatsDatabase) {
 
-    val stats: LiveData<List<Statistic>> =
+    val stats: LiveData<List<AllStatusStatistic>> =
         Transformations.map(database.statsDao.getStatisticByCountry()) {
-            it.asDomainModel()
+            it.asDomainModel(database)
         }
 
     val countries: LiveData<List<Country>> =
@@ -29,24 +28,21 @@ class StatsRepository(private val database: StatsDatabase) {
             it.asDomainModel()
         }
 
-    val todayStats: LiveData<List<Statistic>> =
+    val todayStats: LiveData<List<AllStatusStatistic>> =
         Transformations.map(database.statsDao.getLatestStats()) {
-            it.asDomainModel()
+            it.asDomainModel(database)
         }
 
-    suspend fun getStats(
-        countryCodes: List<String>? = listOf("US"),
-        statuses: List<StatusEnum>? = listOf(StatusEnum.CONFIRMED)
-    ) {
+    suspend fun getStats(countryCodes: List<String>? = listOf("US")) {
         withContext(Dispatchers.IO) {
-            val deferredStats: MutableList<Deferred<List<StatisticNetwork>>> = mutableListOf()
-            var newStats: List<List<StatisticNetwork>> = mutableListOf()
+            val deferredStats: MutableList<Deferred<List<AllStatusStatisticNetwork>>> =
+                mutableListOf()
+            val newStats: List<List<AllStatusStatisticNetwork>>
 
             countryCodes?.forEach { code ->
-                statuses?.forEach { status ->
-                    deferredStats.add(CovidService.service.getDayOneByStatus(code, status.value))
-                }
+                deferredStats.add(CovidService.service.getDayOneAllStatus(code))
             }
+
             newStats = deferredStats.awaitAll()
             database.statsDao.deleteAllStats()
             newStats.forEach { statistic ->

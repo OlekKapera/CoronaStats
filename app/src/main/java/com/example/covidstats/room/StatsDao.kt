@@ -2,23 +2,21 @@ package com.example.covidstats.room
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.example.covidstats.domain.AllStatusStatistic
 import com.example.covidstats.domain.StatusEnum
 
 @Dao
 interface StatsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertStatistic(vararg stats: StatisticTable)
+    fun insertStatistic(vararg stats: AllStatusStatisticTable)
 
-    @Query("select * from statistictable where countryCode in (:countryCodes) and status in (:statuses)")
-    fun getStatisticByCountry(
-        countryCodes: List<String>? = listOf("US"),
-        statuses: List<String>? = listOf(StatusEnum.CONFIRMED.value)
-    ): LiveData<List<StatisticTable>>
+    @Query("select * from allstatusstatistictable where countryCode in (:countryCodes)")
+    fun getStatisticByCountry(countryCodes: List<String>? = listOf("US")): LiveData<List<AllStatusStatisticTable>>
 
-    @Query("delete from statistictable")
+    @Query("delete from allstatusstatistictable")
     fun deleteAllStats()
 
-    @Query("select * from statistictable where countryCode = :countryCode order by date desc")
-    fun getLatestStats(countryCode: String? = "US"): LiveData<List<StatisticTable>>
+    @Query("select * from allstatusstatistictable where countryCode = :countryCode order by date desc")
+    fun getLatestStats(countryCode: String? = "US"): LiveData<List<AllStatusStatisticTable>>
 }

@@ -44,11 +44,11 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
         scope.launch {
             try {
                 //TODO fetch all only first time
-//                repository.getStats()
-                repository.updateCountries()
-                countries.value?.let { countries ->
-                    repository.updateTodayStats(countries[0])
-                }
+                repository.getStats()
+//                repository.updateCountries()
+//                countries.value?.let { countries ->
+//                    repository.updateTodayStats(countries[0])
+//                }
 
             } catch (e: Exception) {
                 engageExceptionAction()

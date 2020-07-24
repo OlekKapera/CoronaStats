@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [CountryTable::class, StatisticTable::class], version = 2)
+@Database(entities = [CountryTable::class, AllStatusStatisticTable::class], version = 3)
 abstract class StatsDatabase() : RoomDatabase() {
     abstract val statsDao: StatsDao
     abstract val countriesDao: CountriesDao
