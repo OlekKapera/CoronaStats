@@ -1,19 +1,18 @@
 package com.example.covidstats.network
 
-import com.example.covidstats.domain.Status
+import com.example.covidstats.domain.Statistic
 import com.example.covidstats.domain.StatusEnum
-import com.example.covidstats.room.StatusTable
+import com.example.covidstats.room.StatisticTable
 import com.example.covidstats.util.DateConverter
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import org.joda.time.DateTime
-import org.joda.time.format.ISODateTimeFormat
 
 /**
  * Used for communication with API. Holds retrieved statistics.
  */
 @JsonClass(generateAdapter = true)
-data class StatusNetwork(
+data class StatisticNetwork(
     @Json(name = "Country") val countryName: String,
     @Json(name = "CountryCode") val countryCode: String,
     @Json(name = "Lat") val latitude: String,
@@ -24,11 +23,11 @@ data class StatusNetwork(
 )
 
 /**
- * Converts [StatusNetwork] to [Status]
+ * Converts [StatisticNetwork] to [Statistic]
  */
-fun List<StatusNetwork>.asDomainModel(): List<Status> {
+fun List<StatisticNetwork>.asDomainModel(): List<Statistic> {
     return map {
-        Status(
+        Statistic(
             countryName = it.countryName,
             countryCode = it.countryCode,
             latitude = it.latitude,
@@ -40,9 +39,9 @@ fun List<StatusNetwork>.asDomainModel(): List<Status> {
     }
 }
 
-fun List<StatusNetwork>.asDatabaseModel(): Array<StatusTable> {
+fun List<StatisticNetwork>.asDatabaseModel(): Array<StatisticTable> {
     return map {
-        StatusTable(
+        StatisticTable(
             countryName = it.countryName,
             countryCode = it.countryCode,
             latitude = it.latitude,

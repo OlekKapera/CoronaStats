@@ -2,7 +2,7 @@ package com.example.covidstats.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.covidstats.domain.Status
+import com.example.covidstats.domain.Statistic
 import com.example.covidstats.domain.StatusEnum
 import org.joda.time.DateTime
 
@@ -11,7 +11,7 @@ import org.joda.time.DateTime
  * (confirmed, deaths, recovered)
  */
 @Entity
-data class StatusTable(
+data class StatisticTable(
 
     @PrimaryKey(autoGenerate = true)
     val id: Long? = null,
@@ -25,11 +25,11 @@ data class StatusTable(
 )
 
 /**
- * Converts [StatusTable] to [Status]
+ * Converts [StatisticTable] to [Statistic]
  */
-fun List<StatusTable>.asDomainModel(): List<Status> {
+fun List<StatisticTable>.asDomainModel(): List<Statistic> {
     return map {
-        Status(
+        Statistic(
             countryName = it.countryName,
             countryCode = it.countryCode,
             latitude = it.latitude,

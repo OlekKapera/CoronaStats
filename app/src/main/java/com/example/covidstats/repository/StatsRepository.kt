@@ -2,10 +2,10 @@ package com.example.covidstats.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.example.covidstats.domain.Status
+import com.example.covidstats.domain.Statistic
 import com.example.covidstats.domain.StatusEnum
 import com.example.covidstats.network.CovidService
-import com.example.covidstats.network.StatusNetwork
+import com.example.covidstats.network.StatisticNetwork
 import com.example.covidstats.network.asDatabaseModel
 import com.example.covidstats.room.StatsDatabase
 import com.example.covidstats.room.asDomainModel
@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 class StatsRepository(private val database: StatsDatabase) {
 
-    val stats: LiveData<List<Status>> =
+    val stats: LiveData<List<Statistic>> =
         Transformations.map(database.statsDao.getStatisticByCountry()) {
             it.asDomainModel()
         }
@@ -26,8 +26,8 @@ class StatsRepository(private val database: StatsDatabase) {
         statuses: List<StatusEnum>? = listOf(StatusEnum.CONFIRMED)
     ) {
         withContext(Dispatchers.IO) {
-            val deferredStats: MutableList<Deferred<List<StatusNetwork>>> = mutableListOf()
-            var newStats: List<List<StatusNetwork>> = mutableListOf()
+            val deferredStats: MutableList<Deferred<List<StatisticNetwork>>> = mutableListOf()
+            var newStats: List<List<StatisticNetwork>> = mutableListOf()
 
             countryCodes?.forEach { code ->
                 statuses?.forEach { status ->

@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 /**
  * Data class representing statistics.
  */
-data class Status(
+data class Statistic(
     val countryName: String,
     val countryCode: String,
     val latitude: String,
