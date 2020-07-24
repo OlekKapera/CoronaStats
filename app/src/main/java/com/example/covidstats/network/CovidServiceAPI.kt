@@ -14,7 +14,7 @@ interface CovidServiceAPI {
 
     @GET("country/{country}")
     fun getStatsByTime(
-        @Path("country") country: String,
+        @Path("country") countrySlug: String,
         @Query("from") fromDate: String,
         @Query("to") toDate: String
     ): Deferred<List<StatisticNetwork>>

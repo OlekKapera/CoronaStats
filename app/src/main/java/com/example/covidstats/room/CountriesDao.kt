@@ -15,6 +15,6 @@ interface CountriesDao{
     @Query("select * from countrytable")
     fun getCountries(): LiveData<List<CountryTable>>
 
-    @Query("select * from countrytable where countryName in (:countryName)")
-    fun getCountryByName(countryName: String): LiveData<CountryTable>
+    @Query("select * from countrytable where iso2 in (:iso)")
+    fun getCountryByIso(iso: String): LiveData<CountryTable>
 }

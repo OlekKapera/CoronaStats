@@ -18,4 +18,7 @@ interface StatsDao {
 
     @Query("delete from statistictable")
     fun deleteAllStats()
+
+    @Query("select * from statistictable where countryCode = :countryCode order by date desc")
+    fun getLatestStats(countryCode: String? = "US"): LiveData<List<StatisticTable>>
 }

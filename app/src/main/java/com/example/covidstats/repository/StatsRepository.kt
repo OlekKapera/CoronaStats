@@ -10,10 +10,12 @@ import com.example.covidstats.network.StatisticNetwork
 import com.example.covidstats.network.asDatabaseModel
 import com.example.covidstats.room.StatsDatabase
 import com.example.covidstats.room.asDomainModel
+import com.example.covidstats.util.DateConverter
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import org.joda.time.DateTime
 
 class StatsRepository(private val database: StatsDatabase) {
 
@@ -24,6 +26,11 @@ class StatsRepository(private val database: StatsDatabase) {
 
     val countries: LiveData<List<Country>> =
         Transformations.map(database.countriesDao.getCountries()) {
+            it.asDomainModel()
+        }
+
+    val todayStats: LiveData<List<Statistic>> =
+        Transformations.map(database.statsDao.getLatestStats()) {
             it.asDomainModel()
         }
 
@@ -52,6 +59,18 @@ class StatsRepository(private val database: StatsDatabase) {
         withContext(Dispatchers.IO) {
             val newCountries = CovidService.service.getAllCountries().await()
             database.countriesDao.insertCountries(*newCountries.asDatabaseModel())
+        }
+    }
+
+    suspend fun updateTodayStats(country: Country) {
+        withContext(Dispatchers.IO) {
+            val now = DateTime.now()
+            val newStats = CovidService.service.getStatsByTime(
+                country.slug,
+                now.minusDays(1).toString(DateConverter),
+                now.toString(DateConverter)
+            ).await()
+            database.statsDao.insertStatistic(*newStats.asDatabaseModel())
         }
     }
 }

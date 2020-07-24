@@ -28,3 +28,11 @@ fun List<CountryTable>.asDomainModel(): List<Country> {
         )
     }
 }
+
+fun CountryTable.asDomainModel(): Country {
+    return Country(
+        countryName = this.countryName,
+        slug = this.slug,
+        iso2 = this.iso2
+    )
+}
