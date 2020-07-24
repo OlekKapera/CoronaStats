@@ -36,10 +36,14 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
         newText
     }
 
+    val countries = repository.countries
+
     init {
         scope.launch {
             try {
-                repository.getStats()
+                //TODO fetch all only first time
+//                repository.getStats()
+                repository.updateCountries()
             } catch (e: Exception) {
                 engageExceptionAction()
                 Log.e(this.javaClass.simpleName, e.message)

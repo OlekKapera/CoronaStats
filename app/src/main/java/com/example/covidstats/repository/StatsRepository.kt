@@ -2,6 +2,7 @@ package com.example.covidstats.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.example.covidstats.domain.Country
 import com.example.covidstats.domain.Statistic
 import com.example.covidstats.domain.StatusEnum
 import com.example.covidstats.network.CovidService
@@ -21,6 +22,11 @@ class StatsRepository(private val database: StatsDatabase) {
             it.asDomainModel()
         }
 
+    val countries: LiveData<List<Country>> =
+        Transformations.map(database.countriesDao.getCountries()) {
+            it.asDomainModel()
+        }
+
     suspend fun getStats(
         countryCodes: List<String>? = listOf("US"),
         statuses: List<StatusEnum>? = listOf(StatusEnum.CONFIRMED)
@@ -37,9 +43,15 @@ class StatsRepository(private val database: StatsDatabase) {
             newStats = deferredStats.awaitAll()
             database.statsDao.deleteAllStats()
             newStats.forEach { statistic ->
-                //TODO delete sublist
-                database.statsDao.insertStatistic(*statistic.subList(0,1000).asDatabaseModel())
+                database.statsDao.insertStatistic(*statistic.asDatabaseModel())
             }
+        }
+    }
+
+    suspend fun updateCountries() {
+        withContext(Dispatchers.IO) {
+            val newCountries = CovidService.service.getAllCountries().await()
+            database.countriesDao.insertCountries(*newCountries.asDatabaseModel())
         }
     }
 }

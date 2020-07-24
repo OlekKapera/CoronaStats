@@ -18,4 +18,7 @@ interface CovidServiceAPI {
         @Query("from") fromDate: String,
         @Query("to") toDate: String
     ): Deferred<List<StatisticNetwork>>
+
+    @GET("countries")
+    fun getAllCountries(): Deferred<List<CountryNetwork>>
 }

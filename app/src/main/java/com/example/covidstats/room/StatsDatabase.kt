@@ -8,6 +8,7 @@ import androidx.room.RoomDatabase
 @Database(entities = [CountryTable::class, StatisticTable::class], version = 2)
 abstract class StatsDatabase() : RoomDatabase() {
     abstract val statsDao: StatsDao
+    abstract val countriesDao: CountriesDao
 }
 
 private lateinit var INSTANCE: StatsDatabase
