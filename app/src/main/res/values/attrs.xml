@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TextDescriptionView">
+        <attr name="descriptionText" format="string" />
+        <attr name="descriptionSize" format="float" />
+        <attr name="mainText" format="string" />
+        <attr name="mainSize" format="float" />
+    </declare-styleable>
+</resources>
