@@ -3,4 +3,6 @@
 
     <string name="exception_general">Something went wrong! Please, try again later.</string>
     <string name="exception_fetch_statistics">Error while fetching statistics.</string>
+
+    <string name="prefs_chosen_countries">"SHARED_PREFS_CHOSEN_COUNTRIES"</string>
 </resources>

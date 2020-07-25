@@ -9,7 +9,7 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        applicationId "com.example.covidstats"
+        applicationId "com.aleksanderkapera.covidstats"
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
@@ -76,4 +76,7 @@ dependencies {
 
     // Joda
     implementation 'net.danlew:android.joda:2.10.6'
+
+    // GSON
+    implementation 'com.google.code.gson:gson:2.8.5'
 }
