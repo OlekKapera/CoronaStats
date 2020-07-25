@@ -1,8 +1,16 @@
 <resources>
     <string name="app_name">CovidStats</string>
 
+    <!--    TEXT_DESCRIPTION-->
+    <string name="new_txt">new</string>
+    <string name="deaths">deaths</string>
+    <string name="recovered">recovered</string>
+
+    <!--    ERRORS-->
     <string name="exception_general">Something went wrong! Please, try again later.</string>
     <string name="exception_fetch_statistics">Error while fetching statistics.</string>
 
+
+    <!--    TAGS-->
     <string name="prefs_chosen_countries">"SHARED_PREFS_CHOSEN_COUNTRIES"</string>
 </resources>

@@ -2,8 +2,8 @@
 <resources>
     <declare-styleable name="TextDescriptionView">
         <attr name="descriptionText" format="string" />
-        <attr name="descriptionSize" format="float" />
+        <attr name="descriptionSize" format="dimension" />
         <attr name="mainText" format="string" />
-        <attr name="mainSize" format="float" />
+        <attr name="mainSize" format="dimension" />
     </declare-styleable>
 </resources>

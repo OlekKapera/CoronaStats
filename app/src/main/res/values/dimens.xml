@@ -21,5 +21,9 @@
     <dimen name="textSize18">18sp</dimen>
     <dimen name="textSize20">20sp</dimen>
     <dimen name="textSize22">22sp</dimen>
+    <dimen name="textSize24">24sp</dimen>
     <dimen name="textSize32">32sp</dimen>
+    <dimen name="textSize42">42sp</dimen>
+
+    <dimen name="latestStats_height">150dp</dimen>
 </resources>

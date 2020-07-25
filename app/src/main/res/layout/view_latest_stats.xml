@@ -2,49 +2,72 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="200dp">
+    android:layout_height="@dimen/latestStats_height">
 
     <LinearLayout
-        android:orientation="vertical"
         android:id="@+id/latestStats_container_new"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="@id/latestStats_container_deaths"
         app:layout_constraintEnd_toStartOf="@id/latestStats_container_info"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+        <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:descriptionText="@string/new_txt"
+            app:mainText="0" />
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="vertical"
         android:id="@+id/latestStats_container_info"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/latestStats_container_deaths"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/latestStats_container_new"
-        app:layout_constraintTop_toTopOf="parent" >
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent"></LinearLayout>
 
 
     <LinearLayout
-        android:orientation="vertical"
         android:id="@+id/latestStats_container_deaths"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/latestStats_container_recovered"
         app:layout_constraintStart_toStartOf="@id/latestStats_container_info"
-        app:layout_constraintTop_toBottomOf="@id/latestStats_container_info" />
+        app:layout_constraintTop_toBottomOf="@id/latestStats_container_info">
+
+        <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:descriptionSize="@dimen/textSize8"
+            app:descriptionText="@string/deaths"
+            app:mainSize="@dimen/textSize24"
+            app:mainText="0" />
+    </LinearLayout>
 
     <LinearLayout
-        android:orientation="vertical"
         android:id="@+id/latestStats_container_recovered"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/latestStats_container_info"
         app:layout_constraintStart_toEndOf="@id/latestStats_container_deaths"
-        app:layout_constraintTop_toBottomOf="@id/latestStats_container_info" />
+        app:layout_constraintTop_toBottomOf="@id/latestStats_container_info">
+
+        <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:descriptionSize="@dimen/textSize8"
+            app:descriptionText="@string/recovered"
+            app:mainSize="@dimen/textSize24"
+            app:mainText="0" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

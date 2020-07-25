@@ -2,6 +2,7 @@ package com.aleksanderkapera.covidstats.ui.custom
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.widget.FrameLayout
 import com.aleksanderkapera.covidstats.R
@@ -12,7 +13,7 @@ class TextDescriptionView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     init {
-        val root = View.inflate(context, R.layout.view_latest_stats, this)
+        View.inflate(context, R.layout.view_text_description, this)
 
         attrs?.let { attributeSet ->
             val a = context.theme.obtainStyledAttributes(
@@ -22,14 +23,25 @@ class TextDescriptionView @JvmOverloads constructor(
                 0
             )
 
+            val mainSize = a.getDimension(R.styleable.TextDescriptionView_mainSize, -1f)
+            val descSize = a.getDimension(R.styleable.TextDescriptionView_descriptionSize, -1f)
+
             textDescription_text_main.text =
                 a.getString(R.styleable.TextDescriptionView_mainText) ?: ""
-            textDescription_text_main.textSize =
-                a.getFloat(R.styleable.TextDescriptionView_mainSize, 32f)
             textDescription_text_description.text =
                 a.getString(R.styleable.TextDescriptionView_descriptionText) ?: ""
-            textDescription_text_description.textSize =
-                a.getFloat(R.styleable.TextDescriptionView_descriptionSize, 32f)
+
+            if (mainSize != -1f)
+                textDescription_text_main.setTextSize(
+                    TypedValue.COMPLEX_UNIT_PX,
+                    mainSize
+                )
+
+            if (descSize != -1f)
+                textDescription_text_description.setTextSize(
+                    TypedValue.COMPLEX_UNIT_PX,
+                    descSize
+                )
         }
     }
 }
