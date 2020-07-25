@@ -1,99 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/latestStats_height">
-
-    <LinearLayout
-        android:id="@+id/latestStats_container_new"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@id/latestStats_container_deaths"
-        app:layout_constraintEnd_toStartOf="@id/latestStats_container_info"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:descriptionText="@string/new_txt"
-            app:mainText="0" />
-    </LinearLayout>
+    android:layout_height="@dimen/latestStats_height"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="5dp"
+    app:cardUseCompatPadding="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/latestStats_container_info"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/latestStats_container_deaths"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/latestStats_container_new"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/latestStats_text_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing8"
-            android:textSize="@dimen/textSize12"
-            android:layout_marginEnd="@dimen/spacing8"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:text="25/07/2020" />
-
-        <TextView
-            android:id="@+id/latestStats_text_country"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/textSize24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+        <LinearLayout
+            android:id="@+id/latestStats_container_new"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/latestStats_container_deaths"
+            app:layout_constraintEnd_toStartOf="@id/latestStats_container_info"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/latestStats_text_date"
-            android:text="Slovakia" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:descriptionText="@string/new_txt"
+                app:mainText="0" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/light_grey"
+            app:layout_constraintStart_toEndOf="@id/latestStats_container_new" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/latestStats_container_info"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/latestStats_container_deaths"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/latestStats_container_new"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/latestStats_text_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing4"
+                android:layout_marginEnd="@dimen/spacing4"
+                android:text="25/07/2020"
+                android:textSize="@dimen/textSize12"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/latestStats_text_country"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Slovakia"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginBottom="@dimen/spacing8"
+                android:textSize="@dimen/textSize24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/latestStats_text_date" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <LinearLayout
+            android:id="@+id/latestStats_container_deaths"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/latestStats_container_recovered"
+            app:layout_constraintStart_toStartOf="@id/latestStats_container_info"
+            app:layout_constraintTop_toBottomOf="@id/latestStats_container_info">
+
+            <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:descriptionSize="@dimen/textSize8"
+                app:descriptionText="@string/deaths"
+                app:mainSize="@dimen/textSize24"
+                app:mainText="0" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/light_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/latestStats_container_new"
+            app:layout_constraintTop_toBottomOf="@id/latestStats_container_info" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="@color/light_grey"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/latestStats_container_deaths"
+            app:layout_constraintTop_toBottomOf="@id/latestStats_container_info" />
+
+        <LinearLayout
+            android:id="@+id/latestStats_container_recovered"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/latestStats_container_info"
+            app:layout_constraintStart_toEndOf="@id/latestStats_container_deaths"
+            app:layout_constraintTop_toBottomOf="@id/latestStats_container_info">
+
+            <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:descriptionSize="@dimen/textSize8"
+                app:descriptionText="@string/recovered"
+                app:mainSize="@dimen/textSize24"
+                app:mainText="0" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <LinearLayout
-        android:id="@+id/latestStats_container_deaths"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/latestStats_container_recovered"
-        app:layout_constraintStart_toStartOf="@id/latestStats_container_info"
-        app:layout_constraintTop_toBottomOf="@id/latestStats_container_info">
-
-        <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:descriptionSize="@dimen/textSize8"
-            app:descriptionText="@string/deaths"
-            app:mainSize="@dimen/textSize24"
-            app:mainText="0" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/latestStats_container_recovered"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/latestStats_container_info"
-        app:layout_constraintStart_toEndOf="@id/latestStats_container_deaths"
-        app:layout_constraintTop_toBottomOf="@id/latestStats_container_info">
-
-        <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:descriptionSize="@dimen/textSize8"
-            app:descriptionText="@string/recovered"
-            app:mainSize="@dimen/textSize24"
-            app:mainText="0" />
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
