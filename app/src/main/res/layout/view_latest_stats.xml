@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/latestStats_height">
 
@@ -21,7 +22,7 @@
             app:mainText="0" />
     </LinearLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/latestStats_container_info"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -29,7 +30,32 @@
         app:layout_constraintBottom_toTopOf="@id/latestStats_container_deaths"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/latestStats_container_new"
-        app:layout_constraintTop_toTopOf="parent"></LinearLayout>
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/latestStats_text_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing8"
+            android:textSize="@dimen/textSize12"
+            android:layout_marginEnd="@dimen/spacing8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="25/07/2020" />
+
+        <TextView
+            android:id="@+id/latestStats_text_country"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/textSize24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/latestStats_text_date"
+            android:text="Slovakia" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <LinearLayout
