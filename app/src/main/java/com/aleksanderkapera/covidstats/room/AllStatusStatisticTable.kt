@@ -9,7 +9,7 @@ import org.joda.time.DateTime
 data class AllStatusStatisticTable(
 
     @PrimaryKey(autoGenerate = true)
-    val id: Long? = 0,
+    val id: Long? = null,
     val date: Long,
     val countryName: String,
     val countryCode: String,
@@ -29,21 +29,28 @@ data class AllStatusStatisticTable(
  */
 fun List<AllStatusStatisticTable>.asDomainModel(database: StatsDatabase): List<AllStatusStatistic> {
     return map {
-        if (database.countriesDao.getCountryByIso(it.countryCode).value == null)
-            throw Exception("No country in database")
-
-        AllStatusStatistic(
-            country = database.countriesDao.getCountryByIso(it.countryCode).value!!.asDomainModel(),
-            province = it.province,
-            city = it.cityName,
-            cityCode = it.cityCode,
-            latitude = it.latitude,
-            longitude = it.longitude,
-            confirmed = it.confirmed,
-            deaths = it.deaths,
-            recovered = it.recovered,
-            active = it.active,
-            date = DateTime(it.date)
-        )
+        it.asDomainModel(database)
     }
+}
+
+/**
+ * Convert [AllStatusStatisticTable] to [AllStatusStatistic]
+ */
+fun AllStatusStatisticTable.asDomainModel(database: StatsDatabase): AllStatusStatistic {
+    val country = database.countriesDao.getCountryByIso(this.countryCode)
+        ?: throw Exception("No country in database")
+
+    return AllStatusStatistic(
+        country = country.asDomainModel(),
+        province = this.province,
+        city = this.cityName,
+        cityCode = this.cityCode,
+        latitude = this.latitude,
+        longitude = this.longitude,
+        confirmed = this.confirmed,
+        deaths = this.deaths,
+        recovered = this.recovered,
+        active = this.active,
+        date = DateTime(this.date)
+    )
 }

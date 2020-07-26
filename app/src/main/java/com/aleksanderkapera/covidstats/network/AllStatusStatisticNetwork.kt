@@ -28,24 +28,31 @@ data class AllStatusStatisticNetwork(
 /**
  * Convert [AllStatusStatisticNetwork] to [AllStatusStatistic]
  */
+fun AllStatusStatisticNetwork.asDomainModel(database: StatsDatabase): AllStatusStatistic {
+    val country = database.countriesDao.getCountryByIso(this.countryCode)
+        ?: throw Exception("No country in database")
+
+    return AllStatusStatistic(
+        country = country.asDomainModel(),
+        province = this.province,
+        city = this.cityName,
+        cityCode = this.cityCode,
+        latitude = this.latitude,
+        longitude = this.longitude,
+        confirmed = this.confirmed,
+        deaths = this.deaths,
+        recovered = this.recovered,
+        active = this.active,
+        date = DateTime.parse(this.date, DateConverter)
+    )
+}
+
+/**
+ * Convert [AllStatusStatisticNetwork] to [AllStatusStatistic]
+ */
 fun List<AllStatusStatisticNetwork>.asDomainModel(database: StatsDatabase): List<AllStatusStatistic> {
     return map {
-        if (database.countriesDao.getCountryByIso(it.countryCode).value == null)
-            throw Exception("No country in database")
-
-        AllStatusStatistic(
-            country = database.countriesDao.getCountryByIso(it.countryCode).value!!.asDomainModel(),
-            province = it.province,
-            city = it.cityName,
-            cityCode = it.cityCode,
-            latitude = it.latitude,
-            longitude = it.longitude,
-            confirmed = it.confirmed,
-            deaths = it.deaths,
-            recovered = it.recovered,
-            active = it.active,
-            date = DateTime.parse(it.date, DateConverter)
-        )
+        it.asDomainModel(database)
     }
 }
 

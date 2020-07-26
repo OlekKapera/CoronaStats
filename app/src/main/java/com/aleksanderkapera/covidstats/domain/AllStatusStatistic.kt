@@ -9,9 +9,9 @@ data class AllStatusStatistic(
     val cityCode: String,
     val latitude: String,
     val longitude: String,
-    val confirmed: Long,
-    val deaths: Long,
-    val recovered: Long,
-    val active: Long,
+    var confirmed: Long,
+    var deaths: Long,
+    var recovered: Long,
+    var active: Long,
     val date: DateTime
 )

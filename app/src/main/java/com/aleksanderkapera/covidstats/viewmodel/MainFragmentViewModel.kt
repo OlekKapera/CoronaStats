@@ -1,8 +1,6 @@
 package com.aleksanderkapera.covidstats.viewmodel
 
 import android.app.Application
-import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import androidx.lifecycle.*
 import com.aleksanderkapera.covidstats.R
@@ -12,8 +10,6 @@ import com.aleksanderkapera.covidstats.room.getDatabase
 import com.aleksanderkapera.covidstats.ui.MainFragment
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -55,15 +51,18 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
         scope.launch {
             try {
                 //TODO fetch all only first time
-//                repository.getStats()
-                repository.updateCountries()
-                countries.value?.let { countries ->
+//                repository.updateCountries()
+//                countries.value?.let { countries ->
 //                    SharedPrefsManager.putList(
 //                        listOf(countries[0], countries[1]),
 //                        R.string.prefs_chosen_countries.asString()
 //                    )
-                    repository.updateTodayStats(countries[110])
-                }
+                repository.getStatsFromLastDays(
+                    SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
+                        ?.get(0) ?: return@launch,
+                    7
+                )
+//                }
             } catch (e: Exception) {
                 engageExceptionAction()
                 Log.e(this.javaClass.simpleName, e.message ?: "")
