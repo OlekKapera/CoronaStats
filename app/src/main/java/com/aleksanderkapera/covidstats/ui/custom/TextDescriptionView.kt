@@ -44,4 +44,11 @@ class TextDescriptionView @JvmOverloads constructor(
                 )
         }
     }
+
+    /**
+     * Sets main text
+     */
+    fun setMainText(text: String) {
+        textDescription_text_main.text = text
+    }
 }

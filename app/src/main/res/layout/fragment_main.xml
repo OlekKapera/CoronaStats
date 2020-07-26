@@ -17,6 +17,11 @@
         <com.aleksanderkapera.covidstats.ui.custom.LatestStatsView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:newCases="150"
+            app:deaths="12"
+            app:recovered="34"
+            app:countryName="Poland"
+            app:date="26/07/2020"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

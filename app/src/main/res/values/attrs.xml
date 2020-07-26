@@ -6,4 +6,12 @@
         <attr name="mainText" format="string" />
         <attr name="mainSize" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="LatestStatsView">
+        <attr name="newCases" format="integer" />
+        <attr name="deaths" format="integer" />
+        <attr name="recovered" format="integer" />
+        <attr name="countryName" format="string" />
+        <attr name="date" format="string" />
+    </declare-styleable>
 </resources>

@@ -23,6 +23,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
+                android:id="@+id/latestStats_textDescription_new"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:descriptionText="@string/new_txt"
@@ -51,23 +52,23 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing4"
                 android:layout_marginEnd="@dimen/spacing4"
-                android:text="25/07/2020"
                 android:textSize="@dimen/textSize12"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="25/07/2020" />
 
             <TextView
                 android:id="@+id/latestStats_text_country"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Slovakia"
-                android:textColor="@color/colorPrimary"
                 android:layout_marginBottom="@dimen/spacing8"
+                android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/textSize24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/latestStats_text_date" />
+                app:layout_constraintTop_toBottomOf="@id/latestStats_text_date"
+                tools:text="Slovakia" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -83,6 +84,7 @@
             app:layout_constraintTop_toBottomOf="@id/latestStats_container_info">
 
             <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
+                android:id="@+id/latestStats_textDescription_deaths"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:descriptionSize="@dimen/textSize8"
@@ -118,6 +120,7 @@
             app:layout_constraintTop_toBottomOf="@id/latestStats_container_info">
 
             <com.aleksanderkapera.covidstats.ui.custom.TextDescriptionView
+                android:id="@+id/latestStats_textDescription_recovered"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:descriptionSize="@dimen/textSize8"
