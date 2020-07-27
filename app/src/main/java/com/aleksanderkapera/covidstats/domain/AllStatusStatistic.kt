@@ -1,5 +1,6 @@
 package com.aleksanderkapera.covidstats.domain
 
+import com.aleksanderkapera.covidstats.util.DateStandardConverter
 import org.joda.time.DateTime
 
 data class AllStatusStatistic(
@@ -14,4 +15,8 @@ data class AllStatusStatistic(
     var recovered: Long,
     var active: Long,
     val date: DateTime
-)
+) {
+
+    val formattedDate: String
+        get() = DateStandardConverter.print(date)
+}

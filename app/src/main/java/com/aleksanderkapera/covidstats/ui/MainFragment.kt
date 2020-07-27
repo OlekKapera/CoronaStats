@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.databinding.FragmentMainBinding
+import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.viewmodel.MainFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
 
@@ -35,8 +36,9 @@ class MainFragment : Fragment() {
             container,
             false
         )
-        binding.lifecycleOwner = this
-        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.vm = viewModel
+        binding.statsData = viewModel.todayStats.value
 
         viewModel.exceptionCaughtEvent.observe(viewLifecycleOwner, Observer { isExceptionCaught ->
             if (isExceptionCaught) {
@@ -47,6 +49,10 @@ class MainFragment : Fragment() {
                 ).show()
                 viewModel.exceptionHandled()
             }
+        })
+
+        viewModel.todayStats.observe(viewLifecycleOwner, Observer {
+            binding.statsData = it
         })
 
         return binding.root

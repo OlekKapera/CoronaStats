@@ -35,7 +35,9 @@ class StatsRepository(private val database: StatsDatabase) {
             it.asDomainModel()
         }
 
-    val todayStats = MutableLiveData<AllStatusStatistic>()
+    private val _todayStats = MutableLiveData<AllStatusStatistic>()
+    val todayStats: LiveData<AllStatusStatistic>
+        get() = _todayStats
 
     suspend fun getStats(countryCodes: List<String>? = listOf("US")) {
         withContext(Dispatchers.IO) {
@@ -110,7 +112,7 @@ class StatsRepository(private val database: StatsDatabase) {
             lastStats[1].active -= lastStats[0].active
             lastStats[1].deaths -= lastStats[0].deaths
             lastStats[1].recovered -= lastStats[0].recovered
-            todayStats.value = lastStats[1]
+            _todayStats.value = lastStats[1]
         }
     }
 }
