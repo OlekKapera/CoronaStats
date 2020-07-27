@@ -37,8 +37,7 @@ class MainFragment : Fragment() {
             false
         )
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.vm = viewModel
-        binding.statsData = viewModel.todayStats.value
+        binding.viewModel = viewModel
 
         viewModel.exceptionCaughtEvent.observe(viewLifecycleOwner, Observer { isExceptionCaught ->
             if (isExceptionCaught) {
@@ -49,10 +48,6 @@ class MainFragment : Fragment() {
                 ).show()
                 viewModel.exceptionHandled()
             }
-        })
-
-        viewModel.todayStats.observe(viewLifecycleOwner, Observer {
-            binding.statsData = it
         })
 
         return binding.root
