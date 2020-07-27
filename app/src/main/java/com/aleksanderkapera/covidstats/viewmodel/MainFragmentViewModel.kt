@@ -51,18 +51,18 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
     init {
         scope.launch {
             try {
-                //TODO fetch all only first time
+                repository.updateStats()
 //                repository.updateCountries()
 //                countries.value?.let { countries ->
 //                    SharedPrefsManager.putList(
 //                        listOf(countries[0], countries[1]),
 //                        R.string.prefs_chosen_countries.asString()
 //                    )
-                repository.getStatsFromLastDays(
-                    SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
-                        ?.get(0) ?: return@launch,
-                    7
-                )
+//                repository.getStatsFromLastDays(
+//                    SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
+//                        ?.get(0) ?: return@launch,
+//                    7
+//                )
 //                }
             } catch (e: Exception) {
                 engageExceptionAction()

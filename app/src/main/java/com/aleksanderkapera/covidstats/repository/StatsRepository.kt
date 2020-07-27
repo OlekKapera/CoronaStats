@@ -39,6 +39,39 @@ class StatsRepository(private val database: StatsDatabase) {
     val todayStats: LiveData<AllStatusStatistic>
         get() = _todayStats
 
+
+    /**
+     * Based on stats accessible in database fetches all accessible ones from the api
+     */
+    suspend fun updateStats() {
+        withContext(Dispatchers.IO) {
+            val userCountries =
+                SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
+            val userCountryCodes = userCountries?.map { it.iso2 } ?: emptyList()
+
+            if (database.statsDao.getSizeOfStats() == 0)
+            // table has no entries, fetch all data
+                getStats(userCountryCodes)
+            else {
+                val lastEntry = database.statsDao.getLastStats(userCountryCodes[0])?.last()
+                    ?.asDomainModel(database) ?: return@withContext getStats(userCountryCodes)
+
+                val lastPossibleDate = DateTime.now().minusDays(1)
+
+                if (lastEntry.date.isBefore(lastPossibleDate))
+                // fetch only data from last one in DB to today's
+                    getStatsByTime(
+                        userCountries?.get(0) ?: return@withContext,
+                        lastEntry.date,
+                        lastPossibleDate
+                    )
+            }
+        }
+    }
+
+    /**
+     * Retrieves all stats from countries from day one
+     */
     suspend fun getStats(countryCodes: List<String>? = listOf("US")) {
         withContext(Dispatchers.IO) {
             val deferredStats: MutableList<Deferred<List<AllStatusStatisticNetwork>>> =

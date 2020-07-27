@@ -20,4 +20,13 @@ interface StatsDao {
 
     @Query("select * from allstatusstatistictable where countryCode = :countryCode order by date desc")
     fun getLatestStats(countryCode: String? = "US"): LiveData<List<AllStatusStatisticTable>>
+
+    @Query("select count(*) from allstatusstatistictable")
+    fun getSizeOfStats(): Int
+
+    @Query("select * from allstatusstatistictable where countryCode = :countryCode order by date desc limit :numberOfStats")
+    fun getLastStats(
+        countryCode: String? = "US",
+        numberOfStats: Int? = 1
+    ): List<AllStatusStatisticTable>?
 }
