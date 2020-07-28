@@ -1,7 +1,6 @@
 package com.aleksanderkapera.covidstats.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
@@ -16,7 +15,10 @@ import com.aleksanderkapera.covidstats.util.DateConverter
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
 import com.aleksanderkapera.covidstats.util.replaceZoneString
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
@@ -35,8 +37,23 @@ class StatsRepository(private val database: StatsDatabase) {
             it.asDomainModel()
         }
 
-    private val _todayStats = MutableLiveData<AllStatusStatistic>()
-    val todayStats: LiveData<AllStatusStatistic>
+    private val _todayStats: LiveData<AllStatusStatistic?> = Transformations.map(stats) { stats ->
+        if (stats.size >= 2) {
+            val lastStats = stats.subList(0, 2)
+
+            if (lastStats.size == 2) {
+                // update today's net difference stats
+                lastStats[0].confirmed -= lastStats[1].confirmed
+                lastStats[0].active -= lastStats[1].active
+                lastStats[0].deaths -= lastStats[1].deaths
+                lastStats[0].recovered -= lastStats[1].recovered
+                return@map lastStats[0]
+            }
+        }
+        null
+    }
+
+    val todayStats: LiveData<AllStatusStatistic?>
         get() = _todayStats
 
 
@@ -56,7 +73,8 @@ class StatsRepository(private val database: StatsDatabase) {
                 val lastEntry = database.statsDao.getLastStats(userCountryCodes[0])?.last()
                     ?.asDomainModel(database) ?: return@withContext getStats(userCountryCodes)
 
-                val lastPossibleDate = DateTime.now().minusDays(1)
+                val lastPossibleDate =
+                    DateTime.now().minusDays(1).withMillisOfDay(0)
 
                 if (lastEntry.date.isBefore(lastPossibleDate))
                 // fetch only data from last one in DB to today's
@@ -136,16 +154,6 @@ class StatsRepository(private val database: StatsDatabase) {
             .withMillisOfSecond(0)
         val from = now.minusDays(numberOfDays)
 
-        val newStats = getStatsByTime(country, from, now)
-
-        newStats?.takeLast(2)?.let { lastStats ->
-
-            // update today's net difference stats
-            lastStats[1].confirmed -= lastStats[0].confirmed
-            lastStats[1].active -= lastStats[0].active
-            lastStats[1].deaths -= lastStats[0].deaths
-            lastStats[1].recovered -= lastStats[0].recovered
-            _todayStats.value = lastStats[1]
-        }
+        getStatsByTime(country, from, now)
     }
 }

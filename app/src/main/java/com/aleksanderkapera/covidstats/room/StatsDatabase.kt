@@ -18,6 +18,7 @@ fun getDatabase(context: Context): StatsDatabase {
         if (!::INSTANCE.isInitialized) {
             INSTANCE = Room.databaseBuilder(context, StatsDatabase::class.java, "stats")
                 .fallbackToDestructiveMigration()
+                .allowMainThreadQueries()
                 .build()
         }
     }
