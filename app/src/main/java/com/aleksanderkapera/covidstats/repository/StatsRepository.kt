@@ -66,21 +66,24 @@ class StatsRepository(private val database: StatsDatabase) {
                 SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
             val userCountryCodes = userCountries?.map { it.iso2 } ?: emptyList()
 
-            if (database.statsDao.getSizeOfStats() == 0)
+            // latest database update time
+            val latestUpdateTime =
+                SharedPrefsManager.get<Long>(R.string.prefs_last_fetched_date.asString())
+
+            if (latestUpdateTime == null)
             // table has no entries, fetch all data
                 getStats(userCountryCodes)
             else {
-                val lastEntry = database.statsDao.getLastStats(userCountryCodes[0])?.last()
-                    ?.asDomainModel(database) ?: return@withContext getStats(userCountryCodes)
-
+                val updateDate = DateTime(latestUpdateTime).plusHours(1)
                 val lastPossibleDate =
-                    DateTime.now().minusDays(1).withMillisOfDay(0)
+                    DateTime.now().minusDays(1).withZone(DateTimeZone.UTC)
+                        .withMillisOfDay(0)
 
-                if (lastEntry.date.isBefore(lastPossibleDate))
+                if (updateDate.isBefore(lastPossibleDate))
                 // fetch only data from last one in DB to today's
                     getStatsByTime(
                         userCountries?.get(0) ?: return@withContext,
-                        lastEntry.date,
+                        updateDate,
                         lastPossibleDate
                     )
             }
@@ -101,7 +104,6 @@ class StatsRepository(private val database: StatsDatabase) {
             }
 
             newStats = deferredStats.awaitAll()
-            database.statsDao.deleteAllStats()
             newStats.forEach { statistic ->
                 database.statsDao.insertStatistic(*statistic.asDatabaseModel())
             }
@@ -137,6 +139,13 @@ class StatsRepository(private val database: StatsDatabase) {
 
             newStats = newStatsNetwork.asDomainModel(database)
             database.statsDao.insertStatistic(*newStatsNetwork.asDatabaseModel())
+
+            newStats?.let {
+                SharedPrefsManager.put<Long>(
+                    it.last().date.millis,
+                    R.string.prefs_last_fetched_date.asString()
+                )
+            }
 
             return@withContext newStats
         }

@@ -13,5 +13,6 @@
 
 
     <!--    TAGS-->
-    <string name="prefs_chosen_countries">"SHARED_PREFS_CHOSEN_COUNTRIES"</string>
+    <string name="prefs_chosen_countries">SHARED_PREFS_CHOSEN_COUNTRIES</string>
+    <string name="prefs_last_fetched_date">SHARED_PREFS_LAST_FETCHED_DATE</string>
 </resources>
