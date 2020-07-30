@@ -104,6 +104,7 @@ class StatsRepository(private val database: StatsDatabase) {
             }
 
             newStats = deferredStats.awaitAll()
+            database.statsDao.deleteAllStats()
             newStats.forEach { statistic ->
                 database.statsDao.insertStatistic(*statistic.asDatabaseModel())
             }

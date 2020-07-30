@@ -15,10 +15,16 @@
         android:layout_height="match_parent"
         tools:context=".ui.MainFragment">
 
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/mainFragment_search"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
         <com.aleksanderkapera.covidstats.ui.custom.LatestStatsView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:data="@{viewModel.todayStats}"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/mainFragment_search" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
