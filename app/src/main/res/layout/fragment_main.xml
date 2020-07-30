@@ -17,14 +17,20 @@
 
         <androidx.appcompat.widget.SearchView
             android:id="@+id/mainFragment_search"
-            app:layout_constraintTop_toTopOf="parent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/mainFragment_recycler_hints"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/mainFragment_search" />
 
         <com.aleksanderkapera.covidstats.ui.custom.LatestStatsView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:data="@{viewModel.todayStats}"
-            app:layout_constraintTop_toBottomOf="@id/mainFragment_search" />
+            app:layout_constraintTop_toBottomOf="@id/mainFragment_recycler_hints" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

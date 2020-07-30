@@ -25,5 +25,10 @@
     <dimen name="textSize32">32sp</dimen>
     <dimen name="textSize42">42sp</dimen>
 
+    <!-- icon sizes -->
+    <dimen name="iconSize24">24dp</dimen>
+    <dimen name="iconSize32">32dp</dimen>
+    <dimen name="iconSize48">48dp</dimen>
+
     <dimen name="latestStats_height">150dp</dimen>
 </resources>
