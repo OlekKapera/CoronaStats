@@ -12,7 +12,10 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.databinding.FragmentMainBinding
+import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.ui.adapter.CountriesListAdapter
+import com.aleksanderkapera.covidstats.util.SharedPrefsManager
+import com.aleksanderkapera.covidstats.util.asString
 import com.aleksanderkapera.covidstats.viewmodel.MainFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -56,8 +59,14 @@ class MainFragment : Fragment() {
         })
 
         // update hintCountries when new countries were fetched
-        viewModel.countries.observe(viewLifecycleOwner, Observer {
-            viewModel.hintCountries.value = it
+        viewModel.countries.observe(viewLifecycleOwner, Observer { countries ->
+            viewModel.hintCountries.value = countries
+
+            if (viewModel.userCountries.isNullOrEmpty() and countries.isNotEmpty())
+                SharedPrefsManager.putList<Country>(
+                    listOf(countries.find { it.iso2 == "PL" } ?: countries.first()),
+                    R.string.prefs_chosen_countries.asString()
+                )
         })
 
         viewModel.hintCountries.observe(viewLifecycleOwner, Observer {

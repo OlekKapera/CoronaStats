@@ -93,7 +93,7 @@ class StatsRepository(private val database: StatsDatabase) {
      * Retrieves all stats from countries from day one
      */
     suspend fun getStats(countryCodes: List<String>? = listOf("US")) {
-        withContext(Dispatchers.IO) {
+        withContext(NonCancellable) {
             val deferredStats: MutableList<Deferred<List<AllStatusStatisticNetwork>>> =
                 mutableListOf()
             val newStats: List<List<AllStatusStatisticNetwork>>
@@ -111,9 +111,11 @@ class StatsRepository(private val database: StatsDatabase) {
     }
 
     suspend fun updateCountries() {
-        withContext(Dispatchers.IO) {
-            val newCountries = CovidService.service.getAllCountries().await()
-            database.countriesDao.insertCountries(*newCountries.asDatabaseModel())
+        if (countries.value.isNullOrEmpty()) {
+            withContext(Dispatchers.IO) {
+                val newCountries = CovidService.service.getAllCountries().await()
+                database.countriesDao.insertCountries(*newCountries.asDatabaseModel())
+            }
         }
     }
 

@@ -26,7 +26,7 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
     private val database = getDatabase(application)
     private val repository = StatsRepository(database)
 
-    private val userCountries =
+    val userCountries =
         SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
 
     private val _exceptionCaughtEvent = MutableLiveData<Boolean>()
@@ -43,6 +43,7 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
     init {
         scope.launch {
             try {
+                repository.updateCountries()
                 repository.updateStats()
             } catch (e: Exception) {
                 engageExceptionAction()
