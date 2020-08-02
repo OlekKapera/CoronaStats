@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface CountriesDao{
+interface CountriesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCountries(vararg country: CountryTable)
@@ -17,4 +17,7 @@ interface CountriesDao{
 
     @Query("select * from countrytable where iso2 = :iso")
     fun getCountryByIso(iso: String): CountryTable?
+
+    @Query("select * from countrytable where countryName like '%' || :countryName || '%'")
+    fun getCountryByName(countryName: String): List<CountryTable>?
 }

@@ -6,15 +6,13 @@ import androidx.lifecycle.*
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.repository.StatsRepository
+import com.aleksanderkapera.covidstats.room.asDomainModel
 import com.aleksanderkapera.covidstats.room.getDatabase
 import com.aleksanderkapera.covidstats.ui.MainFragment
 import com.aleksanderkapera.covidstats.util.DateStandardConverter
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 
 /**
@@ -40,7 +38,7 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
     val countries = repository.countries
     val todayStats = repository.todayStats
 
-    val displayableCountries = mutableListOf<Country>()
+    val hintCountries = MutableLiveData<List<Country>?>()
 
     init {
         scope.launch {
@@ -56,6 +54,11 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
+    }
+
+    fun getCountriesByName(countryName: String) {
+        hintCountries.value =
+            database.countriesDao.getCountryByName(countryName)?.map { it.asDomainModel() }
     }
 
     /**
