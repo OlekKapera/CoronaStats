@@ -1,7 +1,6 @@
 package com.aleksanderkapera.covidstats.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -92,5 +91,15 @@ class MainFragment : Fragment() {
                 return true
             }
         })
+
+        mainFragment_search.setOnSearchClickListener {
+            mainFragment_recycler_hints.visibility = View.VISIBLE
+        }
+
+        mainFragment_search.setOnCloseListener {
+            mainFragment_recycler_hints.visibility = View.GONE
+            mainFragment_search.onActionViewCollapsed()
+            true
+        }
     }
 }
