@@ -14,6 +14,8 @@ import kotlinx.android.synthetic.main.item_country.view.*
 class CountriesListAdapter(var countries: List<Country>) :
     RecyclerView.Adapter<CountriesListAdapter.ViewHolder>() {
 
+    val clickedCountries = mutableSetOf<String>()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.item_country, parent, false)
@@ -23,10 +25,13 @@ class CountriesListAdapter(var countries: List<Country>) :
     override fun getItemCount(): Int = countries.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.text.text = countries[position].countryName
+        val countryName = countries[position].countryName
+        holder.text.text = countryName
+
+        holder.image.visibility = if (countryName in clickedCountries) View.VISIBLE else View.GONE
     }
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
         val text = view.countryItem_text_name as TextView
         val image = view.countryItem_image_tick as ImageView
 
@@ -35,7 +40,13 @@ class CountriesListAdapter(var countries: List<Country>) :
         }
 
         override fun onClick(view: View?) {
-            image.visibility = if (image.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+            if (image.visibility == View.VISIBLE) {
+                clickedCountries.remove(text.text)
+                image.visibility = View.GONE
+            } else {
+                clickedCountries.add(text.text.toString())
+                image.visibility = View.VISIBLE
+            }
         }
     }
 }
