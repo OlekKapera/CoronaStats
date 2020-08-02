@@ -5,16 +5,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.domain.Country
+import com.aleksanderkapera.covidstats.util.SharedPrefsManager
+import com.aleksanderkapera.covidstats.util.asString
 import kotlinx.android.synthetic.main.item_country.view.*
 
 class CountriesListAdapter(var countries: List<Country>) :
     RecyclerView.Adapter<CountriesListAdapter.ViewHolder>() {
 
     val clickedCountries = mutableSetOf<String>()
+
+    init {
+        SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
+            ?.let { countries ->
+                clickedCountries.addAll(countries.map { it.countryName })
+            }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
