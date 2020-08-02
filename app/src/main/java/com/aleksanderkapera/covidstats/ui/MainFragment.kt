@@ -10,8 +10,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.databinding.FragmentMainBinding
+import com.aleksanderkapera.covidstats.ui.adapter.CountriesListAdapter
 import com.aleksanderkapera.covidstats.viewmodel.MainFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -27,6 +29,8 @@ class MainFragment : Fragment() {
         )
             .get(MainFragmentViewModel::class.java)
     }
+
+    private lateinit var hintsAdapter: CountriesListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,16 +56,32 @@ class MainFragment : Fragment() {
             }
         })
 
+        viewModel.countries.observe(viewLifecycleOwner, Observer { data ->
+            hintsAdapter.apply {
+                countries = data
+                notifyDataSetChanged()
+            }
+        })
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val layoutMng = LinearLayoutManager(context)
+        hintsAdapter = CountriesListAdapter(viewModel.countries.value ?: emptyList())
+
+        mainFragment_recycler_hints.apply {
+            layoutManager = layoutMng
+            adapter = hintsAdapter
+        }
+
         (mainFragment_search as SearchView).setOnQueryTextListener(object :
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 Log.d("AA", query)
+                hintsAdapter.notifyDataSetChanged()
                 return true
             }
 
