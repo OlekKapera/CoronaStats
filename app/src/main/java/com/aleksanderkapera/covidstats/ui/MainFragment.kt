@@ -56,11 +56,9 @@ class MainFragment : Fragment() {
             }
         })
 
-        viewModel.countries.observe(viewLifecycleOwner, Observer { data ->
-            hintsAdapter.apply {
-                countries = data
-                notifyDataSetChanged()
-            }
+        viewModel.countries.observe(viewLifecycleOwner, Observer {
+            viewModel.displayableCountries.removeAll { true }
+            viewModel.displayableCountries.addAll(it)
         })
 
         return binding.root
@@ -70,7 +68,7 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val layoutMng = LinearLayoutManager(context)
-        hintsAdapter = CountriesListAdapter(viewModel.countries.value ?: emptyList())
+        hintsAdapter = CountriesListAdapter(viewModel.displayableCountries)
 
         mainFragment_recycler_hints.apply {
             layoutManager = layoutMng
@@ -81,6 +79,8 @@ class MainFragment : Fragment() {
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 Log.d("AA", query)
+                viewModel.countries.value
+                viewModel.displayableCountries
                 hintsAdapter.notifyDataSetChanged()
                 return true
             }

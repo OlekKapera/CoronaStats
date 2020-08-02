@@ -36,34 +36,16 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
         get() = _exceptionCaughtEvent
 
     val statistics = repository.stats
-    val statisticsText = Transformations.map(statistics) { stats ->
-        var newText = ""
-        stats.forEach { statistic ->
-            newText += statistic.toString()
-        }
-        newText
-    }
 
     val countries = repository.countries
-
     val todayStats = repository.todayStats
+
+    val displayableCountries = mutableListOf<Country>()
 
     init {
         scope.launch {
             try {
                 repository.updateStats()
-//                repository.updateCountries()
-//                countries.value?.let { countries ->
-//                    SharedPrefsManager.putList(
-//                        listOf(countries[0], countries[1]),
-//                        R.string.prefs_chosen_countries.asString()
-//                    )
-//                repository.getStatsFromLastDays(
-//                    SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
-//                        ?.get(0) ?: return@launch,
-//                    7
-//                )
-//                }
             } catch (e: Exception) {
                 engageExceptionAction()
                 Log.e(this.javaClass.simpleName, e.message ?: "")

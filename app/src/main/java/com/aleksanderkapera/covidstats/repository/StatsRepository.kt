@@ -1,7 +1,6 @@
 package com.aleksanderkapera.covidstats.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 import com.aleksanderkapera.covidstats.domain.Country
@@ -9,20 +8,21 @@ import com.aleksanderkapera.covidstats.network.AllStatusStatisticNetwork
 import com.aleksanderkapera.covidstats.network.CovidService
 import com.aleksanderkapera.covidstats.network.asDatabaseModel
 import com.aleksanderkapera.covidstats.network.asDomainModel
+import com.aleksanderkapera.covidstats.room.CountryTable
 import com.aleksanderkapera.covidstats.room.StatsDatabase
 import com.aleksanderkapera.covidstats.room.asDomainModel
 import com.aleksanderkapera.covidstats.util.DateConverter
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
 import com.aleksanderkapera.covidstats.util.replaceZoneString
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
 class StatsRepository(private val database: StatsDatabase) {
+
+    private val viewModelJob = SupervisorJob()
+    private val scope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
     val stats: LiveData<List<AllStatusStatistic>> =
         Transformations.map(
@@ -32,7 +32,7 @@ class StatsRepository(private val database: StatsDatabase) {
             )
         ) { it.asDomainModel(database) }
 
-    val countries: LiveData<List<Country>> =
+    var countries: LiveData<List<Country>> =
         Transformations.map(database.countriesDao.getCountries()) {
             it.asDomainModel()
         }
@@ -55,7 +55,6 @@ class StatsRepository(private val database: StatsDatabase) {
 
     val todayStats: LiveData<AllStatusStatistic?>
         get() = _todayStats
-
 
     /**
      * Based on stats accessible in database fetches all accessible ones from the api
