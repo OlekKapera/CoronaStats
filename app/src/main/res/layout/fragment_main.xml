@@ -15,24 +15,19 @@
         android:layout_height="match_parent"
         tools:context=".ui.MainFragment">
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/mainFragment_search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/mainFragment_image_search"
+            android:layout_width="@dimen/iconSize24"
+            android:layout_height="@dimen/iconSize24"
+            android:layout_margin="@dimen/spacing16"
+            android:src="@drawable/ic_search"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/mainFragment_recycler_hints"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/mainFragment_search"
-            tools:listitem="@layout/item_country" />
 
         <com.aleksanderkapera.covidstats.ui.custom.LatestStatsView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:data="@{viewModel.todayStats}"
-            app:layout_constraintTop_toBottomOf="@id/mainFragment_recycler_hints" />
+            app:layout_constraintTop_toBottomOf="@id/mainFragment_image_search" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

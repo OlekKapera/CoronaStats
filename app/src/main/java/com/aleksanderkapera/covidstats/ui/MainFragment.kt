@@ -32,8 +32,6 @@ class MainFragment : Fragment() {
             .get(MainFragmentViewModel::class.java)
     }
 
-    private lateinit var hintsAdapter: CountriesListAdapter
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -69,46 +67,24 @@ class MainFragment : Fragment() {
                 )
         })
 
-        viewModel.hintCountries.observe(viewLifecycleOwner, Observer {
-            hintsAdapter.countries = it ?: emptyList()
-            hintsAdapter.notifyDataSetChanged()
-        })
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val layoutMng = LinearLayoutManager(context)
-        hintsAdapter = CountriesListAdapter(viewModel.hintCountries.value ?: emptyList())
-
-        mainFragment_recycler_hints.apply {
-            layoutManager = layoutMng
-            adapter = hintsAdapter
+        mainFragment_image_search.setOnClickListener {
+            // Open dialog to choose countries to be displayed
+            ChooseCountryDialog(viewModel).show(
+                parentFragmentManager,
+                R.string.dialog_choose_country.asString()
+            )
         }
 
-        (mainFragment_search as SearchView).setOnQueryTextListener(object :
-            SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                viewModel.getCountriesByName(query ?: "")
-                return true
-            }
-
-            override fun onQueryTextChange(query: String?): Boolean {
-                viewModel.getCountriesByName(query ?: "")
-                return true
-            }
-        })
-
-        mainFragment_search.setOnSearchClickListener {
-            mainFragment_recycler_hints.visibility = View.VISIBLE
-        }
-
-        mainFragment_search.setOnCloseListener {
-            mainFragment_recycler_hints.visibility = View.GONE
-            mainFragment_search.onActionViewCollapsed()
-            true
-        }
+//        mainFragment_search.setOnCloseListener {
+//            mainFragment_recycler_hints.visibility = View.GONE
+//            mainFragment_search.onActionViewCollapsed()
+//            true
+//        }
     }
 }
