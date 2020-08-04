@@ -3,6 +3,8 @@ package com.aleksanderkapera.covidstats.ui
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.DialogFragment
@@ -29,23 +31,30 @@ class ChooseCountryDialog(private val viewModel: MainFragmentViewModel) : Dialog
             val inflater = requireActivity().layoutInflater
             val view = inflater.inflate(R.layout.dialog_choose_country, null, false)
 
-            view.dialogCountries_recycler_hints.apply {
-                layoutManager = layoutMng
-                adapter = hintsAdapter
+            view.apply {
+                dialogCountries_recycler_hints.apply {
+                    layoutManager = layoutMng
+                    adapter = hintsAdapter
+                }
+
+                layoutParams = ViewGroup.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+
+                (dialogCountries_search as SearchView).setOnQueryTextListener(object :
+                    SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        viewModel.getCountriesByName(query ?: "")
+                        return true
+                    }
+
+                    override fun onQueryTextChange(query: String?): Boolean {
+                        viewModel.getCountriesByName(query ?: "")
+                        return true
+                    }
+                })
             }
-
-            (view.dialogCountries_search as SearchView).setOnQueryTextListener(object :
-                SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    viewModel.getCountriesByName(query ?: "")
-                    return true
-                }
-
-                override fun onQueryTextChange(query: String?): Boolean {
-                    viewModel.getCountriesByName(query ?: "")
-                    return true
-                }
-            })
 
             builder.setView(view)
                 .setPositiveButton(
