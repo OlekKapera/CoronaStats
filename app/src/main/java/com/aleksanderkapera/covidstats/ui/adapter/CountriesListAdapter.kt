@@ -15,12 +15,12 @@ import kotlinx.android.synthetic.main.item_country.view.*
 class CountriesListAdapter(var countries: List<Country>) :
     RecyclerView.Adapter<CountriesListAdapter.ViewHolder>() {
 
-    val clickedCountries = mutableSetOf<String>()
+    val clickedCountries = mutableSetOf<Country>()
 
     init {
         SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
             ?.let { countries ->
-                clickedCountries.addAll(countries.map { it.countryName })
+                clickedCountries.addAll(countries)
             }
     }
 
@@ -33,10 +33,10 @@ class CountriesListAdapter(var countries: List<Country>) :
     override fun getItemCount(): Int = countries.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val countryName = countries[position].countryName
-        holder.text.text = countryName
+        val country = countries[position]
+        holder.text.text = country.countryName
 
-        holder.image.visibility = if (countryName in clickedCountries) View.VISIBLE else View.GONE
+        holder.image.visibility = if (country in clickedCountries) View.VISIBLE else View.GONE
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
@@ -49,10 +49,11 @@ class CountriesListAdapter(var countries: List<Country>) :
 
         override fun onClick(view: View?) {
             if (image.visibility == View.VISIBLE) {
-                clickedCountries.remove(text.text)
+                clickedCountries.removeIf { it.countryName == text.text }
                 image.visibility = View.GONE
             } else {
-                clickedCountries.add(text.text.toString())
+                clickedCountries.add(countries.find { it.countryName == text.text }
+                    ?: throw Exception("No country in database!"))
                 image.visibility = View.VISIBLE
             }
         }
