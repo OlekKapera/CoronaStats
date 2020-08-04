@@ -12,7 +12,7 @@
         android:id="@+id/countryItem_text_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/spacing32"
+        android:layout_marginStart="@dimen/spacing16"
         android:layout_marginTop="@dimen/spacing16"
         android:layout_marginBottom="@dimen/spacing16"
         android:textColor="@color/black"
@@ -24,9 +24,9 @@
 
     <ImageView
         android:id="@+id/countryItem_image_tick"
-        android:layout_width="@dimen/iconSize32"
-        android:layout_height="@dimen/iconSize32"
-        android:layout_marginEnd="@dimen/spacing32"
+        android:layout_width="@dimen/iconSize24"
+        android:layout_height="@dimen/iconSize24"
+        android:layout_marginEnd="@dimen/spacing16"
         android:src="@drawable/ic_check"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
