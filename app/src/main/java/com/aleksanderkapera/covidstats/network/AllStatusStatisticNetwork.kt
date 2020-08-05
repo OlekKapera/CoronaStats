@@ -29,7 +29,7 @@ data class AllStatusStatisticNetwork(
  * Convert [AllStatusStatisticNetwork] to [AllStatusStatistic]
  */
 fun AllStatusStatisticNetwork.asDomainModel(database: StatsDatabase): AllStatusStatistic {
-    val country = database.countriesDao.getCountryByIso(this.countryCode)
+    val country = database.countriesDao().getCountryByIso(this.countryCode)
         ?: throw Exception("No country in database")
 
     return AllStatusStatistic(

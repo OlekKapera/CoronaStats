@@ -2,29 +2,31 @@ package com.aleksanderkapera.covidstats.viewmodel
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
+import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.repository.StatsRepository
-import com.aleksanderkapera.covidstats.room.asDomainModel
-import com.aleksanderkapera.covidstats.room.getDatabase
 import com.aleksanderkapera.covidstats.ui.MainFragment
-import com.aleksanderkapera.covidstats.util.DateStandardConverter
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 
 /**
  * ViewModel for [MainFragment]
  */
-class MainFragmentViewModel(application: Application) : AndroidViewModel(application) {
+class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel() {
 
     private val viewModelJob = SupervisorJob()
     private val scope = CoroutineScope(viewModelJob + Dispatchers.Main)
-
-    private val database = getDatabase(application)
-    private val repository = StatsRepository(database)
 
     val userCountries =
         SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
@@ -36,7 +38,7 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
     val statistics = repository.stats
 
     val countries = repository.countries
-    val todayStats = repository.todayStats
+    val todayStats: List<LiveData<AllStatusStatistic>?> = repository.todayStats
 
     val hintCountries = MutableLiveData<List<Country>?>()
 
@@ -58,8 +60,7 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun getCountriesByName(countryName: String) {
-        hintCountries.value =
-            database.countriesDao.getCountryByName(countryName)?.map { it.asDomainModel() }
+        hintCountries.value = repository.getCountriesByName(countryName)
     }
 
     /**
@@ -75,16 +76,5 @@ class MainFragmentViewModel(application: Application) : AndroidViewModel(applica
      */
     fun exceptionHandled() {
         _exceptionCaughtEvent.value = false
-    }
-
-    class MainFragmentViewModelFactory(private val application: Application) :
-        ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(MainFragmentViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return MainFragmentViewModel(application) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewmodel")
-        }
     }
 }

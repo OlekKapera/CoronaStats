@@ -7,20 +7,25 @@ import androidx.room.RoomDatabase
 
 @Database(entities = [CountryTable::class, AllStatusStatisticTable::class], version = 4)
 abstract class StatsDatabase() : RoomDatabase() {
-    abstract val statsDao: StatsDao
-    abstract val countriesDao: CountriesDao
-}
+    abstract fun statsDao(): StatsDao
+    abstract fun countriesDao(): CountriesDao
 
-private lateinit var INSTANCE: StatsDatabase
+    companion object {
 
-fun getDatabase(context: Context): StatsDatabase {
-    synchronized(StatsDatabase::class.java) {
-        if (!::INSTANCE.isInitialized) {
-            INSTANCE = Room.databaseBuilder(context, StatsDatabase::class.java, "stats")
+        @Volatile
+        private var instance: StatsDatabase? = null
+
+        fun getInstance(context: Context): StatsDatabase {
+            return instance ?: synchronized(this) {
+                instance ?: buildDatabase(context).also { instance = it }
+            }
+        }
+
+        private fun buildDatabase(context: Context): StatsDatabase {
+            return Room.databaseBuilder(context, StatsDatabase::class.java, "stats")
                 .fallbackToDestructiveMigration()
                 .allowMainThreadQueries()
                 .build()
         }
     }
-    return INSTANCE
 }

@@ -37,7 +37,7 @@ fun List<AllStatusStatisticTable>.asDomainModel(database: StatsDatabase): List<A
  * Convert [AllStatusStatisticTable] to [AllStatusStatistic]
  */
 fun AllStatusStatisticTable.asDomainModel(database: StatsDatabase): AllStatusStatistic {
-    val country = database.countriesDao.getCountryByIso(this.countryCode)
+    val country = database.countriesDao().getCountryByIso(this.countryCode)
         ?: throw Exception("No country in database")
 
     return AllStatusStatistic(
