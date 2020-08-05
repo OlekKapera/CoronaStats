@@ -14,6 +14,7 @@ import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.databinding.FragmentMainBinding
 import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.ui.adapter.CountriesListAdapter
+import com.aleksanderkapera.covidstats.ui.adapter.LatestStatsAdapter
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
 import com.aleksanderkapera.covidstats.viewmodel.MainFragmentViewModel
@@ -31,6 +32,9 @@ class MainFragment : Fragment() {
         )
             .get(MainFragmentViewModel::class.java)
     }
+
+    private val linearLayoutMng = LinearLayoutManager(context)
+    private val recyclerAdapter = LatestStatsAdapter(viewModel.todayStats)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,10 +85,9 @@ class MainFragment : Fragment() {
             )
         }
 
-//        mainFragment_search.setOnCloseListener {
-//            mainFragment_recycler_hints.visibility = View.GONE
-//            mainFragment_search.onActionViewCollapsed()
-//            true
-//        }
+        mainFragment_recycler_latestStats.apply {
+            layoutManager = linearLayoutMng
+            adapter = recyclerAdapter
+        }
     }
 }

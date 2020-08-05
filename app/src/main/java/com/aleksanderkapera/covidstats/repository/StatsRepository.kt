@@ -37,23 +37,9 @@ class StatsRepository(private val database: StatsDatabase) {
             it.asDomainModel()
         }
 
-    private val _todayStats: LiveData<AllStatusStatistic?> = Transformations.map(stats) { stats ->
-        if (stats.size >= 2) {
-            val lastStats = stats.subList(0, 2)
+    private val _todayStats = MutableLiveData<List<AllStatusStatistic?>>()
 
-            if (lastStats.size == 2) {
-                // update today's net difference stats
-                lastStats[0].confirmed -= lastStats[1].confirmed
-                lastStats[0].active -= lastStats[1].active
-                lastStats[0].deaths -= lastStats[1].deaths
-                lastStats[0].recovered -= lastStats[1].recovered
-                return@map lastStats[0]
-            }
-        }
-        null
-    }
-
-    val todayStats: LiveData<AllStatusStatistic?>
+    val todayStats: LiveData<List<AllStatusStatistic?>>
         get() = _todayStats
 
     /**
@@ -166,5 +152,27 @@ class StatsRepository(private val database: StatsDatabase) {
         val from = now.minusDays(numberOfDays)
 
         getStatsByTime(country, from, now)
+    }
+
+    /**
+     * Updates latest stats
+     */
+    private fun updateTodayStats(countries: List<Country>) {
+        _todayStats.value = null
+
+        countries.forEach { country ->
+            val lastStats = database.statsDao.getLastStats(country.iso2, 2)?.map {
+                it.asDomainModel(database)
+            }?.toMutableList() ?: mutableListOf()
+
+            if (lastStats.size == 2) {
+                // update today's net difference stats
+                lastStats[0].confirmed -= lastStats[1].confirmed
+                lastStats[0].active -= lastStats[1].active
+                lastStats[0].deaths -= lastStats[1].deaths
+                lastStats[0].recovered -= lastStats[1].recovered
+            }
+            _todayStats.value = lastStats
+        }
     }
 }
