@@ -1,12 +1,9 @@
 package com.aleksanderkapera.covidstats.viewmodel
 
-import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 import com.aleksanderkapera.covidstats.domain.Country
@@ -38,13 +35,14 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
     val statistics = repository.stats
 
     val countries = repository.countries
-    val todayStats: List<LiveData<AllStatusStatistic>?> = repository.todayStats
+    val todayStats: LiveData<MutableList<LiveData<AllStatusStatistic>?>> = repository.todayStats
 
     val hintCountries = MutableLiveData<List<Country>?>()
 
     init {
         scope.launch {
             try {
+                repository.updateTodayStats(userCountries)
                 repository.updateCountries()
                 repository.updateStats()
             } catch (e: Exception) {

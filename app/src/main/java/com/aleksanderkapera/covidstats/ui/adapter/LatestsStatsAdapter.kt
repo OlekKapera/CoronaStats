@@ -9,7 +9,7 @@ import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.databinding.ViewLatestStatsBinding
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 
-class LatestStatsAdapter(private val todayStats: List<LiveData<AllStatusStatistic>?>) :
+class LatestStatsAdapter(var todayStats: MutableList<LiveData<AllStatusStatistic>?>) :
     RecyclerView.Adapter<LatestStatsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

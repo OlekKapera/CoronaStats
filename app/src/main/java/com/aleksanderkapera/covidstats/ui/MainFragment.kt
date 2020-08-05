@@ -1,13 +1,11 @@
 package com.aleksanderkapera.covidstats.ui
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -52,6 +50,8 @@ class MainFragment : Fragment() {
             viewModel = mainViewModel
         }
 
+        recyclerAdapter = LatestStatsAdapter(mainViewModel.todayStats.value ?: mutableListOf())
+
         mainViewModel.exceptionCaughtEvent.observe(
             viewLifecycleOwner,
             Observer { isExceptionCaught ->
@@ -76,7 +76,10 @@ class MainFragment : Fragment() {
                 )
         })
 
-        recyclerAdapter = LatestStatsAdapter(mainViewModel.todayStats)
+        mainViewModel.todayStats.observe(viewLifecycleOwner, Observer { todayStats ->
+            recyclerAdapter.todayStats = todayStats
+            recyclerAdapter.notifyDataSetChanged()
+        })
 
         return binding.root
     }
