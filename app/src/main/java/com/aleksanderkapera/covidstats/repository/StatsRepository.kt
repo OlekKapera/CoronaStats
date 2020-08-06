@@ -57,24 +57,42 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
 
             // latest database update time
             val latestUpdateTime =
-                SharedPrefsManager.get<Long>(R.string.prefs_last_fetched_date.asString())
+                SharedPrefsManager.get<MutableMap<String, Long>>(R.string.prefs_last_fetched_date.asString())
 
-            if (latestUpdateTime == null)
+            val countriesNotFetched = mutableListOf<String>()
+            latestUpdateTime?.let { latestUpdateTime ->
+                userCountries?.forEach {
+                    if (!latestUpdateTime.containsKey(it.slug)) {
+                        countriesNotFetched.add(it.slug)
+                    }
+                }
+            }
+
+            if (latestUpdateTime.isNullOrEmpty())
             // table has no entries, fetch all data
                 getStats(userCountries)
+            else if (countriesNotFetched.isNotEmpty())
+            // table doesn't contain only some country's data
+                getStats(userCountries?.filter { countriesNotFetched.contains(it.slug) })
             else {
-                val updateDate = DateTime(latestUpdateTime).plusHours(1)
-                val lastPossibleDate =
-                    DateTime.now().minusDays(1).withZone(DateTimeZone.UTC)
-                        .withMillisOfDay(0)
+                latestUpdateTime.forEach loop@{ pair ->
+                    val updateDate = DateTime(pair.value).plusHours(1)
+                    val lastPossibleDate =
+                        DateTime.now().minusDays(1).withZone(DateTimeZone.UTC)
+                            .withMillisOfDay(0)
 
-                if (updateDate.isBefore(lastPossibleDate))
-                // fetch only data from last one in DB to today's
-                    getStatsByTime(
-                        userCountries ?: throw Exception("No user countries provided!"),
-                        updateDate,
-                        lastPossibleDate
-                    )
+                    if (updateDate.isBefore(lastPossibleDate)) {
+                        // fetch only data from last one in DB to today's
+                        getStatsByTime(
+                            userCountries
+                                ?: throw Exception("No user countries provided!"),
+                            updateDate,
+                            lastPossibleDate
+                        )
+                        return@loop
+                    }
+                }
+
             }
         }
     }
@@ -93,7 +111,6 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
             }
 
             newStats = deferredStats.awaitAll()
-            database.statsDao().deleteAllStats()
             newStats.forEach { statistic ->
                 database.statsDao().insertStatistic(*statistic.asDatabaseModel())
             }

@@ -73,14 +73,19 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
      * Updates shared preferences with newest updated date of fetched statistics
      */
     fun updateLastFetchedDate() {
-        if (!statistics.value.isNullOrEmpty()) {
-            statistics.value?.first()?.date?.millis?.let { millis ->
-                SharedPrefsManager.put<Long>(
-                    millis,
-                    R.string.prefs_last_fetched_date.asString()
-                )
+        val map =
+            SharedPrefsManager.get<MutableMap<String, Long>>(R.string.prefs_last_fetched_date.asString())
+                ?.toMutableMap() ?: mutableMapOf()
+
+        _todayStats.value?.forEach { liveStats ->
+            liveStats?.value?.let { stats ->
+                map[stats.country.slug] = stats.date.millis
             }
         }
+        SharedPrefsManager.put<MutableMap<String, Long>>(
+            map,
+            R.string.prefs_last_fetched_date.asString()
+        )
     }
 
     /**
@@ -91,6 +96,7 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
             _todayStats.value = mutableListOf()
 
             viewModelScope.launch {
+                val statsList = mutableListOf<LiveData<AllStatusStatistic>?>()
                 countries.forEach { country ->
                     val lastStats = repository.getLastStats(country)
 
@@ -103,9 +109,10 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
                         lastStats[0].deaths -= lastStats[1].deaths
                         lastStats[0].recovered -= lastStats[1].recovered
 
-                        _todayStats.value?.add(MutableLiveData(lastStats[0]))
+                        statsList.add(MutableLiveData(lastStats[0]))
                     }
                 }
+                _todayStats.value = statsList
             }
         }
     }

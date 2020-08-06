@@ -79,10 +79,11 @@ class MainFragment : Fragment() {
         mainViewModel.todayStats.observe(viewLifecycleOwner, Observer { todayStats ->
             recyclerAdapter.todayStats = todayStats
             recyclerAdapter.notifyDataSetChanged()
+
+            mainViewModel.updateLastFetchedDate()
         })
 
         mainViewModel.statistics.observe(viewLifecycleOwner, Observer {
-            mainViewModel.updateLastFetchedDate()
             mainViewModel.updateTodayStats()
         })
 
