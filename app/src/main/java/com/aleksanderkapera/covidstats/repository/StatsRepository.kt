@@ -1,7 +1,6 @@
 package com.aleksanderkapera.covidstats.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
@@ -9,7 +8,6 @@ import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.network.AllStatusStatisticNetwork
 import com.aleksanderkapera.covidstats.network.CovidService
 import com.aleksanderkapera.covidstats.network.asDatabaseModel
-import com.aleksanderkapera.covidstats.network.asDomainModel
 import com.aleksanderkapera.covidstats.room.StatsDatabase
 import com.aleksanderkapera.covidstats.room.asDomainModel
 import com.aleksanderkapera.covidstats.util.DateConverter
@@ -49,11 +47,6 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
             it.asDomainModel()
         }
 
-    private val _todayStats = MutableLiveData<MutableList<LiveData<AllStatusStatistic>?>>()
-
-    val todayStats: LiveData<MutableList<LiveData<AllStatusStatistic>?>>
-        get() = _todayStats
-
     /**
      * Based on stats accessible in database fetches all accessible ones from the api
      */
@@ -90,10 +83,10 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
      * Retrieves all stats from countries from day one
      */
     suspend fun getStats(countries: List<Country>?) {
-        withContext(NonCancellable) {
+        withContext(Dispatchers.IO) {
+            val newStats: List<List<AllStatusStatisticNetwork>>?
             val deferredStats: MutableList<Deferred<List<AllStatusStatisticNetwork>>> =
                 mutableListOf()
-            val newStats: List<List<AllStatusStatisticNetwork>>
 
             countries?.forEach { country ->
                 deferredStats.add(CovidService.service.getDayOneAllStatus(country.slug))
@@ -104,8 +97,6 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
             newStats.forEach { statistic ->
                 database.statsDao().insertStatistic(*statistic.asDatabaseModel())
             }
-
-            updateTodayStats(countries)
         }
     }
 
@@ -131,34 +122,28 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
     ) {
         val deferredStats: MutableList<Deferred<List<AllStatusStatisticNetwork>>> =
             mutableListOf()
-        var newStats: List<List<AllStatusStatisticNetwork>>?
-        withContext(Dispatchers.IO) {
-            val fromUtc =
-                from.toDateTime(DateTimeZone.UTC).toString(DateConverter).replaceZoneString()
-            val toUtc = to.toDateTime(DateTimeZone.UTC).toString(DateConverter).replaceZoneString()
+        var newStats: List<List<AllStatusStatisticNetwork>>? = emptyList()
+        val fromUtc =
+            from.toDateTime(DateTimeZone.UTC).toString(DateConverter).replaceZoneString()
+        val toUtc = to.toDateTime(DateTimeZone.UTC).toString(DateConverter).replaceZoneString()
 
-            countries.forEach { country ->
-                deferredStats.add(
-                    CovidService.service.getStatsByTime(
-                        country.slug,
-                        fromUtc,
-                        toUtc
-                    )
+        countries.forEach { country ->
+            deferredStats.add(
+                CovidService.service.getStatsByTime(
+                    country.slug,
+                    fromUtc,
+                    toUtc
                 )
-            }
+            )
+        }
+
+        withContext(Dispatchers.IO) {
             newStats = deferredStats.awaitAll()
             newStats?.let { newStats ->
                 newStats.forEach { newStats ->
                     val newStatsDatabase = newStats.asDatabaseModel()
                     database.statsDao().insertStatistic(*newStatsDatabase)
                 }
-
-                updateTodayStats(countries)
-
-                SharedPrefsManager.put<Long>(
-                    newStats.last().last().asDomainModel(database).date.millis,
-                    R.string.prefs_last_fetched_date.asString()
-                )
             }
         }
     }
@@ -177,30 +162,18 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
         getStatsByTime(countries, from, now)
     }
 
-    /**
-     * Updates latest stats
-     */
-    fun updateTodayStats(countries: List<Country>?) {
-        countries?.let {
-            _todayStats.value = mutableListOf()
-
-            countries.forEach { country ->
-                val lastStats = database.statsDao().getLastStats(country.iso2, 2)?.map {
-                    it.asDomainModel(database)
-                }?.toMutableList() ?: mutableListOf()
-
-                if (lastStats.size == 2) {
-                    // update today's net difference stats
-                    lastStats[0].confirmed -= lastStats[1].confirmed
-                    lastStats[0].active -= lastStats[1].active
-                    lastStats[0].deaths -= lastStats[1].deaths
-                    lastStats[0].recovered -= lastStats[1].recovered
-                }
-                _todayStats.value?.add(MutableLiveData(lastStats[0]))
-            }
-        }
-    }
-
     fun getCountriesByName(countryName: String): List<Country>? =
         database.countriesDao().getCountryByName(countryName)?.map { it.asDomainModel() }
+
+    /**
+     * Returns last [numberOfStats] from database of a given [country]
+     */
+    suspend fun getLastStats(
+        country: Country,
+        numberOfStats: Int? = 2
+    ): MutableList<AllStatusStatistic> {
+        return database.statsDao().getLastStats(country.iso2, numberOfStats)?.map {
+            it.asDomainModel(database)
+        }?.toMutableList() ?: mutableListOf()
+    }
 }

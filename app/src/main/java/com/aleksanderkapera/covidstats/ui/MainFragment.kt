@@ -81,6 +81,11 @@ class MainFragment : Fragment() {
             recyclerAdapter.notifyDataSetChanged()
         })
 
+        mainViewModel.statistics.observe(viewLifecycleOwner, Observer {
+            mainViewModel.updateLastFetchedDate()
+            mainViewModel.updateTodayStats()
+        })
+
         return binding.root
     }
 

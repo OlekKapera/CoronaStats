@@ -10,7 +10,7 @@ interface StatsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertStatistic(vararg stats: AllStatusStatisticTable)
 
-    @Query("select * from allstatusstatistictable where countryCode in (:countryCodes)")
+    @Query("select * from allstatusstatistictable where countryCode in (:countryCodes) order by date desc")
     fun getStatisticByCountry(countryCodes: List<String>? = listOf("US")): LiveData<List<AllStatusStatisticTable>>
 
     @Query("delete from allstatusstatistictable")
