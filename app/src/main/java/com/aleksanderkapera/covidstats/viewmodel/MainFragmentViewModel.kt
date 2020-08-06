@@ -12,7 +12,6 @@ import com.aleksanderkapera.covidstats.repository.StatsRepository
 import com.aleksanderkapera.covidstats.ui.MainFragment
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 
@@ -27,6 +26,10 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
     private val _exceptionCaughtEvent = MutableLiveData<Boolean>()
     val exceptionCaughtEvent: LiveData<Boolean>
         get() = _exceptionCaughtEvent
+
+    private val _chooseCountryDialogEvent = MutableLiveData<Boolean>()
+    val chooseCountryDialogEvent: LiveData<Boolean>
+        get() = _chooseCountryDialogEvent
 
     val statistics = repository.stats
 
@@ -67,6 +70,14 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
      */
     fun exceptionHandled() {
         _exceptionCaughtEvent.value = false
+    }
+
+    fun onCountryDialogChosen() {
+        _chooseCountryDialogEvent.value = true
+    }
+
+    fun finishCountryDialogChosen() {
+        _chooseCountryDialogEvent.value = false
     }
 
     /**
@@ -116,4 +127,6 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
             }
         }
     }
+
+    fun updateStats() = viewModelScope.launch { repository.updateStats() }
 }

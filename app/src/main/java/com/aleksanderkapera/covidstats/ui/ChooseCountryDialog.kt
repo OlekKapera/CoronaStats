@@ -67,6 +67,7 @@ class ChooseCountryDialog(private val viewModel: MainFragmentViewModel) : Dialog
                             hintsAdapter.clickedCountries.toList(),
                             R.string.prefs_chosen_countries.asString()
                         )
+                        viewModel.onCountryDialogChosen()
                     })
                 .setNegativeButton(
                     R.string.cancel,
