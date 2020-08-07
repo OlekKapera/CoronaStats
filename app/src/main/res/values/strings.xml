@@ -19,4 +19,5 @@
     <string name="prefs_chosen_countries">SHARED_PREFS_CHOSEN_COUNTRIES</string>
     <string name="prefs_last_fetched_date">SHARED_PREFS_LAST_FETCHED_DATE</string>
     <string name="dialog_choose_country">DIALOG_CHOOSE_COUNTRY</string>
+    <string name="preferences_file_name">PREFERENCES_FILE_NAME</string>
 </resources>

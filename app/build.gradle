@@ -74,9 +74,8 @@ dependencies {
 
     // ViewModel and LiveData (arch components)
     implementation "androidx.lifecycle:lifecycle-extensions:$version_lifecycle_extensions"
-
-    // Glide for images
-    implementation "com.github.bumptech.glide:glide:$version_glide"
+    implementation "io.reactivex.rxjava2:rxandroid:2.0.2"
+    implementation "io.reactivex.rxjava2:rxjava:2.2.9"
 
     // Room database
     implementation "androidx.room:room-runtime:$version_room"
