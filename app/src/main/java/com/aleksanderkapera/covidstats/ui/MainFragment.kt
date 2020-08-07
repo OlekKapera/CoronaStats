@@ -66,12 +66,12 @@ class MainFragment : Fragment() {
             })
 
         mainViewModel.userCountries.observe(viewLifecycleOwner, Observer {
+            mainViewModel.updateTodayStats()
+
             if (mainViewModel.chooseCountryDialogEvent) {
                 mainViewModel.updateStats()
                 mainViewModel.finishCountryDialogChosen()
-            } else
-                mainViewModel.updateTodayStats()
-
+            }
         })
 
         // update hintCountries when new countries were fetched
