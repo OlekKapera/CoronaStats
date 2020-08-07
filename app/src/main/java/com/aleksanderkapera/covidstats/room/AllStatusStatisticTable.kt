@@ -1,11 +1,12 @@
 package com.aleksanderkapera.covidstats.room
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 import org.joda.time.DateTime
 
-@Entity
+@Entity(indices = [Index(value = ["date", "countryCode"], unique = true)])
 data class AllStatusStatisticTable(
 
     @PrimaryKey(autoGenerate = true)
