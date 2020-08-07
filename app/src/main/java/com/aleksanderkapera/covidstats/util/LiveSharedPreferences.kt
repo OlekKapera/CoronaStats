@@ -1,14 +1,17 @@
 package com.aleksanderkapera.covidstats.util
 
+import android.app.Application
+import android.content.Context
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.aleksanderkapera.covidstats.R
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.reactivex.subjects.PublishSubject
 
-class LiveSharedPreferences constructor(private val _preferences: SharedPreferences) {
+object LiveSharedPreferences{
 
     private val updates = PublishSubject.create<String>()
 
@@ -16,20 +19,23 @@ class LiveSharedPreferences constructor(private val _preferences: SharedPreferen
         updates.onNext(key)
     }
 
-    val preferences: SharedPreferences
-        get() = _preferences
+    private lateinit var preferences: SharedPreferences
 
     val gson = Gson()
 
-    init {
-        _preferences.registerOnSharedPreferenceChangeListener(listener)
+    fun with(application: Application) {
+        preferences = application.getSharedPreferences(
+            R.string.preferences_file_name.asString(),
+            Context.MODE_PRIVATE
+        )
+        preferences.registerOnSharedPreferenceChangeListener(listener)
     }
 
     /**
      * Retrieve standard types from preferences
      */
     fun <T> get(key: String, defaultValue: T?) =
-        LivePreference(updates, _preferences, key, defaultValue)
+        LivePreference(updates, preferences, key, defaultValue)
 
     /**
      * Used to retrieve object from the Preferences as liveData.

@@ -10,6 +10,7 @@ import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.repository.StatsRepository
 import com.aleksanderkapera.covidstats.ui.MainFragment
+import com.aleksanderkapera.covidstats.util.LiveSharedPreferences
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
 import kotlinx.coroutines.launch
@@ -21,15 +22,13 @@ import kotlinx.coroutines.launch
 class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel() {
 
     val userCountries =
-        SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
+        LiveSharedPreferences.getObjectList<Country>(R.string.prefs_chosen_countries.asString())
 
     private val _exceptionCaughtEvent = MutableLiveData<Boolean>()
     val exceptionCaughtEvent: LiveData<Boolean>
         get() = _exceptionCaughtEvent
 
-    private val _chooseCountryDialogEvent = MutableLiveData<Boolean>()
-    val chooseCountryDialogEvent: LiveData<Boolean>
-        get() = _chooseCountryDialogEvent
+    var chooseCountryDialogEvent = false
 
     val statistics = repository.stats
 
@@ -48,7 +47,7 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
                 repository.updateStats()
             } catch (e: Exception) {
                 engageExceptionAction()
-                Log.e(this.javaClass.simpleName, e.message ?: "")
+                Log.e(this.javaClass.simpleName, e.toString())
             }
         }
     }
@@ -73,11 +72,11 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
     }
 
     fun onCountryDialogChosen() {
-        _chooseCountryDialogEvent.value = true
+        chooseCountryDialogEvent = true
     }
 
     fun finishCountryDialogChosen() {
-        _chooseCountryDialogEvent.value = false
+        chooseCountryDialogEvent = false
     }
 
     /**
@@ -103,7 +102,7 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
      * Updates latest stats
      */
     fun updateTodayStats() {
-        userCountries?.let { countries ->
+        userCountries.value?.let { countries ->
             _todayStats.value = mutableListOf()
 
             viewModelScope.launch {

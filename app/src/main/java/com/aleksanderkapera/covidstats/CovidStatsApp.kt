@@ -1,6 +1,7 @@
 package com.aleksanderkapera.covidstats
 
 import android.app.Application
+import com.aleksanderkapera.covidstats.util.LiveSharedPreferences
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import net.danlew.android.joda.JodaTimeAndroid
 
@@ -17,9 +18,10 @@ class CovidStatsApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        context = this
+
         JodaTimeAndroid.init(this)
         SharedPrefsManager.with(this)
-
-        context = this
+        LiveSharedPreferences.with(this)
     }
 }

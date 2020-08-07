@@ -1,10 +1,6 @@
 package com.aleksanderkapera.covidstats.ui
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +13,9 @@ import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.databinding.FragmentMainBinding
 import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.ui.adapter.LatestStatsAdapter
-import com.aleksanderkapera.covidstats.util.*
+import com.aleksanderkapera.covidstats.util.InjectorUtils
+import com.aleksanderkapera.covidstats.util.SharedPrefsManager
+import com.aleksanderkapera.covidstats.util.asString
 import com.aleksanderkapera.covidstats.viewmodel.MainFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -29,9 +27,6 @@ class MainFragment : Fragment() {
     private val linearLayoutMng = LinearLayoutManager(context)
     private lateinit var recyclerAdapter: LatestStatsAdapter
 
-    private lateinit var preference: SharedPreferences
-    private lateinit var liveSharedPreferences: LiveSharedPreferences
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -39,11 +34,6 @@ class MainFragment : Fragment() {
             this,
             InjectorUtils.provideMainFragmentViewModelFactory(requireActivity())
         ).get(MainFragmentViewModel::class.java)
-
-        preference = context?.getSharedPreferences(
-            R.string.preferences_file_name.asString(), Context.MODE_PRIVATE
-        ) ?: return
-        liveSharedPreferences = LiveSharedPreferences(preference)
     }
 
     override fun onCreateView(
@@ -75,18 +65,20 @@ class MainFragment : Fragment() {
                 }
             })
 
-        mainViewModel.chooseCountryDialogEvent.observe(viewLifecycleOwner, Observer { isChosen ->
-            if (isChosen) {
+        mainViewModel.userCountries.observe(viewLifecycleOwner, Observer {
+            if (mainViewModel.chooseCountryDialogEvent) {
                 mainViewModel.updateStats()
                 mainViewModel.finishCountryDialogChosen()
-            }
+            } else
+                mainViewModel.updateTodayStats()
+
         })
 
         // update hintCountries when new countries were fetched
         mainViewModel.countries.observe(viewLifecycleOwner, Observer { countries ->
             mainViewModel.hintCountries.value = countries
 
-            if (mainViewModel.userCountries.isNullOrEmpty() and countries.isNotEmpty())
+            if (mainViewModel.userCountries.value?.isNullOrEmpty() == true && countries.isNotEmpty())
                 SharedPrefsManager.putList<Country>(
                     listOf(countries.find { it.iso2 == "PL" } ?: countries.first()),
                     R.string.prefs_chosen_countries.asString()
