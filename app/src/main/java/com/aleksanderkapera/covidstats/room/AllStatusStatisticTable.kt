@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 import org.joda.time.DateTime
 
-@Entity(indices = [Index(value = ["date", "countryCode"], unique = true)])
+@Entity(indices = [Index(value = ["date", "countryCode", "province"], unique = true)])
 data class AllStatusStatisticTable(
 
     @PrimaryKey(autoGenerate = true)

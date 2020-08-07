@@ -45,7 +45,7 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
             try {
                 repository.updateCountries()
                 repository.updateStats()
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 engageExceptionAction()
                 Log.e(this.javaClass.simpleName, e.toString())
             }
