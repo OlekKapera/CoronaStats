@@ -1,7 +1,10 @@
 package com.aleksanderkapera.covidstats.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 import com.aleksanderkapera.covidstats.domain.Country
@@ -9,7 +12,6 @@ import com.aleksanderkapera.covidstats.repository.StatsRepository
 import com.aleksanderkapera.covidstats.ui.MainFragment
 import com.aleksanderkapera.covidstats.util.*
 import kotlinx.coroutines.launch
-import kotlin.time.milliseconds
 
 
 /**
@@ -25,6 +27,10 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
         get() = _exceptionCaughtEvent
 
     var chooseCountryDialogEvent = false
+
+    private val _loadingEvent = MutableLiveData<Boolean>()
+    val loadingEvent: LiveData<Boolean>
+        get() = _loadingEvent
 
     val statistics = repository.stats
 
@@ -42,11 +48,14 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
     init {
         viewModelScope.launch {
             try {
+                loadingStarted()
                 repository.updateCountries()
                 repository.updateStats()
             } catch (e: Throwable) {
                 engageExceptionAction()
                 Log.e(this.javaClass.simpleName, e.toString())
+            } finally {
+                loadingFinished()
             }
         }
     }
@@ -141,5 +150,23 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
         }
     }
 
-    fun updateStats() = viewModelScope.launch { repository.updateStats() }
+    fun updateStats() = viewModelScope.launch {
+        try {
+            loadingStarted()
+            repository.updateStats()
+        } catch (e: Throwable) {
+            engageExceptionAction()
+            Log.e(this.javaClass.simpleName, e.toString())
+        } finally {
+            loadingFinished()
+        }
+    }
+
+    private fun loadingStarted() {
+        _loadingEvent.value = true
+    }
+
+    private fun loadingFinished() {
+        _loadingEvent.value = false
+    }
 }

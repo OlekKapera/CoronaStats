@@ -28,9 +28,6 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
             }
     }
 
-    private val viewModelJob = SupervisorJob()
-    private val scope = CoroutineScope(viewModelJob + Dispatchers.Main)
-
     val stats: LiveData<List<AllStatusStatistic>> =
         Transformations.map(
             database.statsDao().getLatestStats(

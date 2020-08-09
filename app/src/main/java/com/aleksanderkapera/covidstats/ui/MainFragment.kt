@@ -51,6 +51,7 @@ class MainFragment : Fragment() {
         }
 
         recyclerAdapter = LatestStatsAdapter(mainViewModel.todayStats.value ?: mutableListOf())
+        initObservers()
 
         mainViewModel.exceptionCaughtEvent.observe(
             viewLifecycleOwner,
@@ -65,6 +66,31 @@ class MainFragment : Fragment() {
                 }
             })
 
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        mainFragment_image_search.setOnClickListener {
+            // Open dialog to choose countries to be displayed
+            ChooseCountryDialog(mainViewModel).show(
+                parentFragmentManager,
+                R.string.dialog_choose_country.asString()
+            )
+        }
+
+        mainFragment_recycler_latestStats.apply {
+            layoutManager = linearLayoutMng
+            adapter = recyclerAdapter
+        }
+
+        mainFragment_refresh.setOnRefreshListener {
+            mainViewModel.updateStats()
+        }
+    }
+
+    private fun initObservers() {
         mainViewModel.userCountries.observe(viewLifecycleOwner, Observer {
             mainViewModel.updateTodayStats()
 
@@ -96,23 +122,8 @@ class MainFragment : Fragment() {
             mainViewModel.updateTodayStats()
         })
 
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        mainFragment_image_search.setOnClickListener {
-            // Open dialog to choose countries to be displayed
-            ChooseCountryDialog(mainViewModel).show(
-                parentFragmentManager,
-                R.string.dialog_choose_country.asString()
-            )
-        }
-
-        mainFragment_recycler_latestStats.apply {
-            layoutManager = linearLayoutMng
-            adapter = recyclerAdapter
-        }
+        mainViewModel.loadingEvent.observe(viewLifecycleOwner, Observer { isLoading ->
+            mainFragment_refresh.isRefreshing = isLoading
+        })
     }
 }
