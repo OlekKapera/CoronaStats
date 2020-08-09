@@ -49,11 +49,19 @@ class ChooseCountryDialog(private val viewModel: MainFragmentViewModel) : Dialog
                     SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
                         viewModel.getCountriesByName(query ?: "")
+
+                        if (query.isNullOrEmpty())
+                            viewModel.hintCountries
+                        
                         return true
                     }
 
                     override fun onQueryTextChange(query: String?): Boolean {
                         viewModel.getCountriesByName(query ?: "")
+
+                        if (query.isNullOrEmpty())
+                            viewModel.hintCountries
+
                         return true
                     }
                 })
@@ -68,12 +76,20 @@ class ChooseCountryDialog(private val viewModel: MainFragmentViewModel) : Dialog
                             R.string.prefs_chosen_countries.asString()
                         )
                         viewModel.onCountryDialogChosen()
+                        resetHints()
                     })
                 .setNegativeButton(
                     R.string.cancel,
-                    DialogInterface.OnClickListener { dialogInterface, i -> dialogInterface.cancel() })
+                    DialogInterface.OnClickListener { dialogInterface, i ->
+                        dialogInterface.cancel()
+                        resetHints()
+                    })
 
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    private fun resetHints() {
+        viewModel.hintCountries.value = viewModel.countries.value
     }
 }
