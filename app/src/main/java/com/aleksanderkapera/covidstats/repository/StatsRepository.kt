@@ -98,7 +98,7 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
      * Retrieves all stats from countries from day one
      */
     suspend fun getStats(countries: List<Country>?) {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Unconfined + NonCancellable) {
             val newStats: List<List<AllStatusStatisticNetwork>>?
             val deferredStats: MutableList<Deferred<List<AllStatusStatisticNetwork>>> =
                 mutableListOf()
