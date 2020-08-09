@@ -11,6 +11,8 @@ val DateConverter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ")
 // Converter for dd-MM-yyyy format
 val DateStandardConverter = DateTimeFormat.forPattern("dd-MM-yyyy")
 
+const val DAY_IN_MILLIS = 86400000
+
 /**
  * Replaces zone indication at the end of the date to 'Z'
  */

@@ -1,19 +1,13 @@
 package com.aleksanderkapera.covidstats.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.repository.StatsRepository
 import com.aleksanderkapera.covidstats.ui.MainFragment
-import com.aleksanderkapera.covidstats.util.DateLastSavedStatsModel
-import com.aleksanderkapera.covidstats.util.LiveSharedPreferences
-import com.aleksanderkapera.covidstats.util.SharedPrefsManager
-import com.aleksanderkapera.covidstats.util.asString
+import com.aleksanderkapera.covidstats.util.*
 import kotlinx.coroutines.launch
 
 
@@ -40,6 +34,9 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
         get() = _todayStats
 
     val hintCountries = MutableLiveData<List<Country>?>()
+    private val lastSavedDate =
+        SharedPrefsManager.getList<DateLastSavedStatsModel>(R.string.prefs_last_fetched_date.asString())
+            ?.toMutableList() ?: mutableListOf()
 
     init {
         viewModelScope.launch {
@@ -84,17 +81,13 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
      * Updates shared preferences with newest updated date of fetched statistics
      */
     fun updateLastFetchedDate() {
-        val prefsDates =
-            SharedPrefsManager.getList<DateLastSavedStatsModel>(R.string.prefs_last_fetched_date.asString())
-                ?.toMutableList() ?: mutableListOf()
-
         _todayStats.value?.forEach { liveStats ->
             liveStats?.value?.let { stats ->
-                prefsDates.find { it.countrySlug == stats.country.slug }.also { pref ->
+                lastSavedDate.find { it.countrySlug == stats.country.slug }.also { pref ->
                     if (pref != null)
                         pref.date = stats.date.millis
                     else
-                        prefsDates.add(
+                        lastSavedDate.add(
                             DateLastSavedStatsModel(
                                 stats.country.slug,
                                 stats.date.millis
@@ -103,9 +96,9 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
                 }
             }
         }
-        
+
         SharedPrefsManager.putList<DateLastSavedStatsModel>(
-            prefsDates,
+            lastSavedDate,
             R.string.prefs_last_fetched_date.asString()
         )
     }
@@ -122,14 +115,16 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
                 countries.forEach { country ->
                     val lastStats = repository.getLastStats(country)
 
-//                    val millis =
-//                        SharedPrefsManager.get<MutableMap<String, ULong>>(R.string.prefs_last_fetched_date.asString())
-//                            ?.get(country.slug)
-//                    val poop = repository.getLastStatsCombined(
-//                        country,
-//                        2,
-//                        millis?.toLong() ?: 0L
-//                    )
+                    if (lastSavedDate.isNotEmpty()) {
+
+                        val dates = mutableListOf(lastSavedDate[0].date)
+                        dates.add(dates[0].minus(DAY_IN_MILLIS))
+                        val poop = repository.getLastStatsCombined(
+                            country,
+                            dates
+                        )
+                        print(poop)
+                    }
 
                     if (lastStats.size != 2) {
                         //TODO fetch stats from API

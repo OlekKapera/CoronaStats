@@ -8,6 +8,7 @@ import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.network.AllStatusStatisticNetwork
 import com.aleksanderkapera.covidstats.network.CovidService
 import com.aleksanderkapera.covidstats.network.asDatabaseModel
+import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
 import com.aleksanderkapera.covidstats.room.StatsDatabase
 import com.aleksanderkapera.covidstats.room.asDomainModel
 import com.aleksanderkapera.covidstats.util.DateConverter
@@ -194,11 +195,10 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
         }?.toMutableList() ?: mutableListOf()
     }
 
-    suspend fun getLastStatsCombined(
+    fun getLastStatsCombined(
         country: Country,
-        numberOfStats: Int = 2,
-        millis: Long
-    ): Int {
-        return database.statsDao().getLastStatsCombined(country.iso2, numberOfStats, millis)
+        millis: List<Long>
+    ): List<AllStatusStatisticTable> {
+        return database.statsDao().getLastStatsCombined(country.iso2, millis)
     }
 }
