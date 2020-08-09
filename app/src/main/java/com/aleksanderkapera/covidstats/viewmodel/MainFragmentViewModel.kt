@@ -9,6 +9,7 @@ import com.aleksanderkapera.covidstats.repository.StatsRepository
 import com.aleksanderkapera.covidstats.ui.MainFragment
 import com.aleksanderkapera.covidstats.util.*
 import kotlinx.coroutines.launch
+import kotlin.time.milliseconds
 
 
 /**
@@ -113,18 +114,16 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
             viewModelScope.launch {
                 val statsList = mutableListOf<LiveData<AllStatusStatistic>?>()
                 countries.forEach { country ->
-                    val lastStats = repository.getLastStats(country)
-
-                    if (lastSavedDate.isNotEmpty()) {
-
-                        val dates = mutableListOf(lastSavedDate[0].date)
-                        dates.add(dates[0].minus(DAY_IN_MILLIS))
-                        val poop = repository.getLastStatsCombined(
-                            country,
-                            dates
+                    val dates =
+                        mutableListOf(
+                            lastSavedDate.find { it.countrySlug == country.slug }?.date ?: 0L
                         )
-                        print(poop)
-                    }
+                    dates.add(dates[0].minus(DAY_IN_MILLIS))
+
+                    val lastStats = repository.getLastStatsCombined(
+                        country,
+                        dates.toList()
+                    )
 
                     if (lastStats.size != 2) {
                         //TODO fetch stats from API

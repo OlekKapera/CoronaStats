@@ -186,7 +186,7 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
     /**
      * Returns last [numberOfStats] from database of a given [country]
      */
-    suspend fun getLastStats(
+    fun getLastStats(
         country: Country,
         numberOfStats: Int = 2
     ): MutableList<AllStatusStatistic> {
@@ -195,10 +195,15 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
         }?.toMutableList() ?: mutableListOf()
     }
 
+    /**
+     * Returns last stats from database of a given [country] a combines numbers from all provinces
+     */
     fun getLastStatsCombined(
         country: Country,
         millis: List<Long>
-    ): List<AllStatusStatisticTable> {
-        return database.statsDao().getLastStatsCombined(country.iso2, millis)
+    ): MutableList<AllStatusStatistic> {
+        return database.statsDao().getLastStatsCombined(country.iso2, millis)?.map {
+            it.asDomainModel(database)
+        }?.toMutableList() ?: mutableListOf()
     }
 }
