@@ -28,9 +28,9 @@ interface StatsDao {
         numberOfStats: Int
     ): List<AllStatusStatisticTable>?
 
-    @Query("select date, countryName, countryCode, province, cityName, cityCode, latitude, longitude, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(active) as active from allstatusstatistictable where countryCode = :countryCode and date in (:millis) group by date order by date desc")
+    @Query("select date, countryName, countryCode, province, cityName, cityCode, latitude, longitude, sum(confirmed) as confirmed, sum(deaths) as deaths, sum(recovered) as recovered, sum(active) as active from allstatusstatistictable where countryCode = :countryCode group by date order by date desc limit :limit")
     fun getLastStatsCombined(
         countryCode: String? = "US",
-        millis: List<Long>
+        limit: Int = 2
     ): List<AllStatusStatisticTable>?
 }

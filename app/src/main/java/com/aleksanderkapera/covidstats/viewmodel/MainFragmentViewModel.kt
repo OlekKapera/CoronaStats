@@ -121,8 +121,7 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
                     dates.add(dates[0].minus(DAY_IN_MILLIS))
 
                     val lastStats = repository.getLastStatsCombined(
-                        country,
-                        dates.toList()
+                        country
                     )
 
                     if (lastStats.size != 2) {

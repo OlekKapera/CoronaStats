@@ -8,13 +8,9 @@ import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.network.AllStatusStatisticNetwork
 import com.aleksanderkapera.covidstats.network.CovidService
 import com.aleksanderkapera.covidstats.network.asDatabaseModel
-import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
 import com.aleksanderkapera.covidstats.room.StatsDatabase
 import com.aleksanderkapera.covidstats.room.asDomainModel
-import com.aleksanderkapera.covidstats.util.DateConverter
-import com.aleksanderkapera.covidstats.util.SharedPrefsManager
-import com.aleksanderkapera.covidstats.util.asString
-import com.aleksanderkapera.covidstats.util.replaceZoneString
+import com.aleksanderkapera.covidstats.util.*
 import kotlinx.coroutines.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -58,13 +54,13 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
 
             // latest database update time
             val latestUpdateTime =
-                SharedPrefsManager.get<MutableMap<String, Long>>(R.string.prefs_last_fetched_date.asString())
+                SharedPrefsManager.getList<DateLastSavedStatsModel>(R.string.prefs_last_fetched_date.asString())
 
             val countriesNotFetched = mutableListOf<String>()
             latestUpdateTime?.let { latestUpdateTime ->
-                userCountries?.forEach {
-                    if (!latestUpdateTime.containsKey(it.slug)) {
-                        countriesNotFetched.add(it.slug)
+                userCountries?.forEach { country ->
+                    if (latestUpdateTime.find { it.countrySlug == country.slug } == null) {
+                        countriesNotFetched.add(country.slug)
                     }
                 }
             }
@@ -77,7 +73,7 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
                 getStats(userCountries?.filter { countriesNotFetched.contains(it.slug) })
             else {
                 latestUpdateTime.forEach loop@{ pair ->
-                    val updateDate = DateTime(pair.value).plusHours(1)
+                    val updateDate = DateTime(pair.date).plusHours(1)
                     val lastPossibleDate =
                         DateTime.now().minusDays(1).withZone(DateTimeZone.UTC)
                             .withMillisOfDay(0)
@@ -199,10 +195,9 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
      * Returns last stats from database of a given [country] a combines numbers from all provinces
      */
     fun getLastStatsCombined(
-        country: Country,
-        millis: List<Long>
+        country: Country
     ): MutableList<AllStatusStatistic> {
-        return database.statsDao().getLastStatsCombined(country.iso2, millis)?.map {
+        return database.statsDao().getLastStatsCombined(country.iso2)?.map {
             it.asDomainModel(database)
         }?.toMutableList() ?: mutableListOf()
     }
