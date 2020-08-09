@@ -25,6 +25,13 @@ interface StatsDao {
     @Query("select * from allstatusstatistictable where countryCode = :countryCode order by date desc limit :numberOfStats")
     fun getLastStats(
         countryCode: String? = "US",
-        numberOfStats: Int? = 1
+        numberOfStats: Int
     ): List<AllStatusStatisticTable>?
+
+    @Query("select sum(confirmed) from allstatusstatistictable where countryCode = :countryCode and date = :millis order by date desc limit :numberOfStats")
+    fun getLastStatsCombined(
+        countryCode: String? = "US",
+        numberOfStats: Int,
+        millis: Long
+    ): Int
 }
