@@ -5,7 +5,7 @@
     <string name="cancel">cancel</string>
 
     <!--    MAIN FRAGMENT-->
-    <string name="search">Search</string>
+    <string name="add_countries">Add countries</string>
 
     <!--    TEXT DESCRIPTION-->
     <string name="new_txt">new</string>

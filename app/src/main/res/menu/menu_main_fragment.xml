@@ -7,6 +7,6 @@
         android:layout_width="@dimen/iconSize24"
         android:layout_height="@dimen/iconSize24"
         android:icon="@drawable/ic_add"
-        android:title="@string/search"
+        android:title="@string/add_countries"
         app:showAsAction="always" />
 </menu>

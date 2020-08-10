@@ -83,22 +83,19 @@ class MainFragment : Fragment() {
         }
 
         mainFragment_toolbar.inflateMenu(R.menu.menu_main_fragment)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        inflater.inflate(R.menu.menu_main_fragment, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            // Open dialog to choose countries to be displayed
-            R.id.mainFragment_menu_add -> ChooseCountryDialog(mainViewModel).show(
-                parentFragmentManager,
-                R.string.dialog_choose_country.asString()
-            )
-            else -> return false
+        mainFragment_toolbar.setOnMenuItemClickListener { item ->
+            return@setOnMenuItemClickListener when (item.itemId) {
+                // Open dialog to choose countries to be displayed
+                R.id.mainFragment_menu_add -> {
+                    ChooseCountryDialog(mainViewModel).show(
+                        parentFragmentManager,
+                        R.string.dialog_choose_country.asString()
+                    )
+                    true
+                }
+                else -> false
+            }
         }
-        return true
     }
 
     private fun initObservers() {
