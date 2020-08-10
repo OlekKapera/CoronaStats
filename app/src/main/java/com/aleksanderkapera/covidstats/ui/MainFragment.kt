@@ -1,9 +1,8 @@
 package com.aleksanderkapera.covidstats.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -50,6 +49,8 @@ class MainFragment : Fragment() {
             viewModel = mainViewModel
         }
 
+//        (activity as? AppCompatActivity)?.setSupportActionBar(binding.root.findViewById(R.id.mainFragment_toolbar))
+
         recyclerAdapter = LatestStatsAdapter(mainViewModel.todayStats.value ?: mutableListOf())
         initObservers()
 
@@ -72,14 +73,6 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainFragment_image_search.setOnClickListener {
-            // Open dialog to choose countries to be displayed
-            ChooseCountryDialog(mainViewModel).show(
-                parentFragmentManager,
-                R.string.dialog_choose_country.asString()
-            )
-        }
-
         mainFragment_recycler_latestStats.apply {
             layoutManager = linearLayoutMng
             adapter = recyclerAdapter
@@ -88,6 +81,24 @@ class MainFragment : Fragment() {
         mainFragment_refresh.setOnRefreshListener {
             mainViewModel.updateStats()
         }
+
+        mainFragment_toolbar.inflateMenu(R.menu.menu_main_fragment)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+//        inflater.inflate(R.menu.menu_main_fragment, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            // Open dialog to choose countries to be displayed
+            R.id.mainFragment_menu_add -> ChooseCountryDialog(mainViewModel).show(
+                parentFragmentManager,
+                R.string.dialog_choose_country.asString()
+            )
+            else -> return false
+        }
+        return true
     }
 
     private fun initObservers() {

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/mainFragment_menu_add"
+        android:layout_width="@dimen/iconSize24"
+        android:layout_height="@dimen/iconSize24"
+        android:icon="@drawable/ic_add"
+        android:title="@string/search"
+        app:showAsAction="always" />
+</menu>

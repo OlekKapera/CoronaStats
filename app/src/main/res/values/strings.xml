@@ -4,7 +4,10 @@
     <string name="ok">ok</string>
     <string name="cancel">cancel</string>
 
-    <!--    TEXT_DESCRIPTION-->
+    <!--    MAIN FRAGMENT-->
+    <string name="search">Search</string>
+
+    <!--    TEXT DESCRIPTION-->
     <string name="new_txt">new</string>
     <string name="deaths">deaths</string>
     <string name="recovered">recovered</string>
