@@ -35,7 +35,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:descriptionText="@string/new_txt"
-                    app:mainText="5341" />
+                    app:mainText="@{String.valueOf(data.confirmed)}" />
             </LinearLayout>
 
             <View
@@ -101,7 +101,7 @@
                     app:descriptionSize="@dimen/textSize8"
                     app:descriptionText="@string/deaths"
                     app:mainSize="@dimen/textSize24"
-                    app:mainText="142" />
+                    app:mainText="@{String.valueOf(data.deaths)}" />
             </LinearLayout>
 
             <View
@@ -137,7 +137,7 @@
                     app:descriptionSize="@dimen/textSize8"
                     app:descriptionText="@string/recovered"
                     app:mainSize="@dimen/textSize24"
-                    app:mainText="1024" />
+                    app:mainText="@{String.valueOf(data.recovered)}" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
