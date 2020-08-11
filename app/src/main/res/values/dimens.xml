@@ -30,6 +30,8 @@
     <dimen name="iconSize32">32dp</dimen>
     <dimen name="iconSize48">48dp</dimen>
 
-    <dimen name="latestStats_min_height">170dp</dimen>
-    <dimen name="latestStats_min_width">300dp</dimen>
+    <dimen name="latestStats_height">170dp</dimen>
+
+    <dimen name="widget_min_height">110dp</dimen>
+    <dimen name="widget_min_width">250dp</dimen>
 </resources>
