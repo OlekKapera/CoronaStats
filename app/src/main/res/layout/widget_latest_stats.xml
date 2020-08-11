@@ -31,18 +31,22 @@
                 android:foreground="?android:attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_refresh" />
 
-            <TextView
-                android:id="@+id/widget_text_newDescription"
-                style="@style/WidgetTextDescription"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="@string/new_txt" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/widget_text_newMain"
-                style="@style/WidgetTextMain"
-                android:layout_below="@id/widget_text_newDescription"
-                android:layout_centerHorizontal="true"
-                android:text="@{String.valueOf(data.confirmed)}" />
+                <TextView
+                    android:id="@+id/widget_text_newDescription"
+                    style="@style/WidgetTextDescription"
+                    android:text="@string/new_txt" />
+
+                <TextView
+                    android:id="@+id/widget_text_newMain"
+                    style="@style/WidgetTextMain"
+                    android:text="0" />
+            </LinearLayout>
         </RelativeLayout>
 
         <LinearLayout
@@ -66,7 +70,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="@dimen/spacing4"
                 android:layout_marginEnd="@dimen/spacing4"
-                android:text="@{data.formattedDate}"
+                android:text=""
                 android:textSize="@dimen/textSize12" />
 
             <TextView
@@ -76,7 +80,7 @@
                 android:layout_centerInParent="true"
                 android:layout_marginBottom="@dimen/spacing8"
                 android:gravity="center"
-                android:text="@{data.country.countryName}"
+                android:text=""
                 android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/textSize24" />
         </RelativeLayout>
@@ -104,7 +108,7 @@
             <TextView
                 android:id="@+id/widget_text_deathsMain"
                 style="@style/WidgetTextMain.Small"
-                android:text="@{String.valueOf(data.deaths)}" />
+                android:text="0" />
         </LinearLayout>
 
         <LinearLayout
@@ -129,7 +133,7 @@
             <TextView
                 android:id="@+id/widget_text_recoveredMain"
                 style="@style/WidgetTextMain.Small"
-                android:text="@{String.valueOf(data.recovered)}" />
+                android:text="0" />
         </LinearLayout>
     </GridLayout>
 </layout>
