@@ -15,23 +15,35 @@
         android:columnCount="6"
         android:rowCount="3">
 
-        <LinearLayout
-            style="@style/WidgetBoxLayout"
+        <RelativeLayout
             android:layout_rowSpan="3"
             android:layout_rowWeight="1"
             android:layout_columnSpan="2"
             android:layout_columnWeight="0.5">
 
+            <ImageView
+                android:id="@+id/widget_image_refresh"
+                android:layout_width="@dimen/iconSize24"
+                android:layout_height="@dimen/iconSize24"
+                android:layout_margin="@dimen/spacing8"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_refresh" />
+
             <TextView
                 android:id="@+id/widget_text_newDescription"
                 style="@style/WidgetTextDescription"
+                android:layout_centerInParent="true"
                 android:text="@string/new_txt" />
 
             <TextView
                 android:id="@+id/widget_text_newMain"
                 style="@style/WidgetTextMain"
+                android:layout_below="@id/widget_text_newDescription"
+                android:layout_centerHorizontal="true"
                 android:text="@{String.valueOf(data.confirmed)}" />
-        </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
             style="@style/Separator.Vertical"

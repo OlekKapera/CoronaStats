@@ -1,10 +1,13 @@
 package com.aleksanderkapera.covidstats.ui
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.content.Intent
 import android.widget.RemoteViews
 import com.aleksanderkapera.covidstats.R
+import com.aleksanderkapera.covidstats.util.asString
 
 /**
  * Implementation of App Widget functionality.
@@ -35,18 +38,27 @@ class LatestStatsWidget : AppWidgetProvider() {
 
     companion object {
 
-internal fun updateAppWidget(
-    context: Context,
-    appWidgetManager: AppWidgetManager,
-    appWidgetId: Int
-) {
-    val widgetText = context.getString(R.string.appwidget_text)
-    // Construct the RemoteViews object
-    val views = RemoteViews(context.packageName,
-        R.layout.latest_stats_widget
-    )
-//    views.setTextViewText(R.id.appwidget_text, widgetText)
+        internal fun updateAppWidget(
+            context: Context,
+            appWidgetManager: AppWidgetManager,
+            appWidgetId: Int
+        ) {
+            val widgetText = context.getString(R.string.appwidget_text)
+            // Construct the RemoteViews object
+            val views = RemoteViews(
+                context.packageName,
+                R.layout.widget_latest_stats
+            )
+//            views.setOnClickPendingIntent(R.id.widget_image_refresh, getPendingIntent(context))
 
-    // Instruct the widget manager to update the widget
-    appWidgetManager.updateAppWidget(appWidgetId, views)
-}}}
+            // Instruct the widget manager to update the widget
+            appWidgetManager.updateAppWidget(appWidgetId, views)
+        }
+
+        private fun getPendingIntent(context: Context): PendingIntent {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.action = R.string.intent_refresh_stats.asString()
+            return PendingIntent.getActivity(context, 100, intent, 0)
+        }
+    }
+}
