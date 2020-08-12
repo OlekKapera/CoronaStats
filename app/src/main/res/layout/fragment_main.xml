@@ -37,7 +37,8 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/mainFragment_recycler_latestStats"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    tools:listitem="@layout/view_latest_stats" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </LinearLayout>
