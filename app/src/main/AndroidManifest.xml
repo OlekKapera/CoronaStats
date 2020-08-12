@@ -22,6 +22,10 @@
                 android:resource="@xml/latest_stats_widget_info" />
         </receiver>
 
+        <service
+            android:name=".service.WidgetIntentService"
+            android:exported="false" />
+
         <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

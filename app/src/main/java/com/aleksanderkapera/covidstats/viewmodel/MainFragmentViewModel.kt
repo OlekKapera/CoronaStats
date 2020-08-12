@@ -11,6 +11,7 @@ import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.domain.asDatabaseModel
 import com.aleksanderkapera.covidstats.repository.StatsRepository
 import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
+import com.aleksanderkapera.covidstats.ui.LatestStatsWidget.Companion.sendRefreshWidgetIntent
 import com.aleksanderkapera.covidstats.ui.MainFragment
 import com.aleksanderkapera.covidstats.util.*
 import kotlinx.coroutines.launch
@@ -153,6 +154,8 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
                     statsList.map { it?.value?.asDatabaseModel() },
                     R.string.prefs_latest_stats.asString()
                 )
+
+                sendRefreshWidgetIntent()
             }
         }
     }
