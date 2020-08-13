@@ -83,6 +83,13 @@ object SharedPrefsManager {
     }
 
     /**
+     * Delete Shared Preference based on key
+     */
+    fun delete(key: String) {
+        preferences.edit().remove(key).apply()
+    }
+
+    /**
      * Data class encapsulating generic list type
      */
     data class Container<T>(val values: List<T>)
