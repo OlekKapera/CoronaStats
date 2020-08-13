@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.databinding.FragmentMainBinding
 import com.aleksanderkapera.covidstats.domain.Country
@@ -16,6 +17,7 @@ import com.aleksanderkapera.covidstats.ui.adapter.LatestStatsAdapter
 import com.aleksanderkapera.covidstats.util.InjectorUtils
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
+import com.aleksanderkapera.covidstats.viewmodel.ChooseCountryDialogViewModel
 import com.aleksanderkapera.covidstats.viewmodel.MainFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -23,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_main.*
 class MainFragment : Fragment() {
 
     private lateinit var mainViewModel: MainFragmentViewModel
+    private lateinit var chooseCountryDialogViewModel: ChooseCountryDialogViewModel
 
     private val linearLayoutMng = LinearLayoutManager(context)
     private lateinit var recyclerAdapter: LatestStatsAdapter
@@ -32,8 +35,13 @@ class MainFragment : Fragment() {
 
         mainViewModel = ViewModelProvider(
             this,
-            InjectorUtils.provideMainFragmentViewModelFactory(requireActivity())
+            InjectorUtils.provideMainFragmentViewModelFactory(CovidStatsApp.context)
         ).get(MainFragmentViewModel::class.java)
+
+        chooseCountryDialogViewModel = ViewModelProvider(
+            requireActivity(),
+            InjectorUtils.provideChooseCountryDialogViewModelFactory(CovidStatsApp.context)
+        ).get(ChooseCountryDialogViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -86,7 +94,7 @@ class MainFragment : Fragment() {
             return@setOnMenuItemClickListener when (item.itemId) {
                 // Open dialog to choose countries to be displayed
                 R.id.mainFragment_menu_add -> {
-                    ChooseCountryDialog(mainViewModel).show(
+                    ChooseCountryDialog().show(
                         parentFragmentManager,
                         R.string.dialog_choose_country.asString()
                     )
@@ -100,16 +108,20 @@ class MainFragment : Fragment() {
     private fun initObservers() {
         mainViewModel.userCountries.observe(viewLifecycleOwner, Observer {
             mainViewModel.updateTodayStats()
-
-            if (mainViewModel.chooseCountryDialogEvent) {
-                mainViewModel.updateStats()
-                mainViewModel.finishCountryDialogChosen()
-            }
         })
+
+        chooseCountryDialogViewModel.onPositiveButtonClickEvent.observe(
+            viewLifecycleOwner,
+            Observer { isClicked ->
+                if (isClicked) {
+                    mainViewModel.updateStats()
+                    chooseCountryDialogViewModel.finishOnPositiveButtonClick()
+                }
+            })
 
         // update hintCountries when new countries were fetched
         mainViewModel.countries.observe(viewLifecycleOwner, Observer { countries ->
-            mainViewModel.hintCountries.value = countries
+            chooseCountryDialogViewModel.hintCountries.value = countries
 
             if (mainViewModel.userCountries.value?.isNullOrEmpty() == true && countries.isNotEmpty())
                 SharedPrefsManager.putList<Country>(

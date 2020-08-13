@@ -12,25 +12,25 @@ import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.repository.StatsRepository
 import com.aleksanderkapera.covidstats.room.StatsDatabase
 import com.aleksanderkapera.covidstats.util.asString
-import com.aleksanderkapera.covidstats.viewmodel.MainFragmentViewModel
-import com.aleksanderkapera.covidstats.viewmodel.MainFragmentViewModelFactory
+import com.aleksanderkapera.covidstats.viewmodel.ChooseCountryDialogViewModel
+import com.aleksanderkapera.covidstats.viewmodel.ChooseCountryDialogViewModelFactory
 
 class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
     private val database = StatsDatabase.getInstance(CovidStatsApp.context)
     private val repository = StatsRepository.getInstance(database)
-    private lateinit var viewModel: MainFragmentViewModel
+    private lateinit var viewModel: ChooseCountryDialogViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProvider(
             this,
-            MainFragmentViewModelFactory(repository)
-        ).get(MainFragmentViewModel::class.java)
+            ChooseCountryDialogViewModelFactory(repository)
+        ).get(ChooseCountryDialogViewModel::class.java)
 
-        ChooseCountryDialog(viewModel).show(
+        ChooseCountryDialog().show(
             supportFragmentManager,
             R.string.dialog_choose_country.asString()
         )
@@ -41,12 +41,9 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
             AppWidgetManager.INVALID_APPWIDGET_ID
         ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
 
-        viewModel.userCountries.observe(this, Observer {
-            viewModel.updateTodayStats()
-
-            if (viewModel.chooseCountryDialogEvent) {
-                viewModel.updateStats()
-                viewModel.finishCountryDialogChosen()
+        viewModel.onPositiveButtonClickEvent.observe(this, Observer { isClicked ->
+            if (isClicked) {
+                viewModel.finishOnPositiveButtonClick()
                 close()
             }
         })

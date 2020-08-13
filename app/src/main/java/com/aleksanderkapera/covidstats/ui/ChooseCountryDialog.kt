@@ -8,6 +8,8 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,17 +25,19 @@ import kotlinx.android.synthetic.main.dialog_choose_country.view.*
 
 class ChooseCountryDialog : DialogFragment() {
 
-    private val viewModel = ViewModelProvider(
-        this,
-        InjectorUtils.provideChooseCountryDialogViewModelFactory(CovidStatsApp.context)
-    ).get(
-        ChooseCountryDialogViewModel::class.java
-    )
+    private lateinit var viewModel: ChooseCountryDialogViewModel
 
     private val layoutMng = LinearLayoutManager(context)
-    private val hintsAdapter = CountriesListAdapter(viewModel.hintCountries.value ?: emptyList())
+    private lateinit var hintsAdapter: CountriesListAdapter
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            InjectorUtils.provideChooseCountryDialogViewModelFactory(CovidStatsApp.context)
+        ).get(ChooseCountryDialogViewModel::class.java)
+
+        hintsAdapter = CountriesListAdapter(viewModel.hintCountries.value ?: emptyList())
+
         viewModel.hintCountries.observe(this, Observer {
             hintsAdapter.countries = it ?: emptyList()
             hintsAdapter.notifyDataSetChanged()
@@ -85,6 +89,7 @@ class ChooseCountryDialog : DialogFragment() {
                             hintsAdapter.clickedCountries.toList(),
                             R.string.prefs_chosen_countries.asString()
                         )
+                        viewModel.updateStats()
                         viewModel.onPositiveButtonClick()
                         resetHints()
                     })
@@ -100,6 +105,6 @@ class ChooseCountryDialog : DialogFragment() {
     }
 
     private fun resetHints() {
-        viewModel.hintCountries.value = viewModel.countries.value
+//        viewModel.hintCountries.value = viewModel.countries.value
     }
 }
