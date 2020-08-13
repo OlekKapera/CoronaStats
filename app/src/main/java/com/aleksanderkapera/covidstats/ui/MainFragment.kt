@@ -50,8 +50,6 @@ class MainFragment : Fragment() {
             viewModel = mainViewModel
         }
 
-//        (activity as? AppCompatActivity)?.setSupportActionBar(binding.root.findViewById(R.id.mainFragment_toolbar))
-
         recyclerAdapter = LatestStatsAdapter(mainViewModel.todayStats.value ?: mutableListOf())
         initObservers()
 

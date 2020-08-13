@@ -9,16 +9,26 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.ui.adapter.CountriesListAdapter
+import com.aleksanderkapera.covidstats.util.InjectorUtils
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
-import com.aleksanderkapera.covidstats.viewmodel.MainFragmentViewModel
+import com.aleksanderkapera.covidstats.viewmodel.ChooseCountryDialogViewModel
 import kotlinx.android.synthetic.main.dialog_choose_country.view.*
 
-class ChooseCountryDialog(private val viewModel: MainFragmentViewModel) : DialogFragment() {
+class ChooseCountryDialog : DialogFragment() {
+
+    private val viewModel = ViewModelProvider(
+        this,
+        InjectorUtils.provideChooseCountryDialogViewModelFactory(CovidStatsApp.context)
+    ).get(
+        ChooseCountryDialogViewModel::class.java
+    )
 
     private val layoutMng = LinearLayoutManager(context)
     private val hintsAdapter = CountriesListAdapter(viewModel.hintCountries.value ?: emptyList())
@@ -52,7 +62,7 @@ class ChooseCountryDialog(private val viewModel: MainFragmentViewModel) : Dialog
 
                         if (query.isNullOrEmpty())
                             viewModel.hintCountries
-                        
+
                         return true
                     }
 
@@ -75,7 +85,7 @@ class ChooseCountryDialog(private val viewModel: MainFragmentViewModel) : Dialog
                             hintsAdapter.clickedCountries.toList(),
                             R.string.prefs_chosen_countries.asString()
                         )
-                        viewModel.onCountryDialogChosen()
+                        viewModel.onPositiveButtonClick()
                         resetHints()
                     })
                 .setNegativeButton(

@@ -29,8 +29,6 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
     val exceptionCaughtEvent: LiveData<Boolean>
         get() = _exceptionCaughtEvent
 
-    var chooseCountryDialogEvent = false
-
     private val _loadingEvent = MutableLiveData<Boolean>()
     val loadingEvent: LiveData<Boolean>
         get() = _loadingEvent
@@ -43,7 +41,6 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
     val todayStats: LiveData<MutableList<LiveData<AllStatusStatistic>?>>
         get() = _todayStats
 
-    val hintCountries = MutableLiveData<List<Country>?>()
     private val lastSavedDate =
         SharedPrefsManager.getList<DateLastSavedStatsModel>(R.string.prefs_last_fetched_date.asString())
             ?.toMutableList() ?: mutableListOf()
@@ -63,10 +60,6 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
         }
     }
 
-    fun getCountriesByName(countryName: String) {
-        hintCountries.value = repository.getCountriesByName(countryName)
-    }
-
     /**
      * Is being called when network related exception is called and changed liveData's value for
      * further handling
@@ -80,14 +73,6 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
      */
     fun exceptionHandled() {
         _exceptionCaughtEvent.value = false
-    }
-
-    fun onCountryDialogChosen() {
-        chooseCountryDialogEvent = true
-    }
-
-    fun finishCountryDialogChosen() {
-        chooseCountryDialogEvent = false
     }
 
     /**
