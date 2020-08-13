@@ -34,9 +34,10 @@ class ChooseCountryDialog : DialogFragment() {
             InjectorUtils.provideChooseCountryDialogViewModelFactory(CovidStatsApp.context)
         ).get(ChooseCountryDialogViewModel::class.java)
 
+        viewModel.getCountriesByName("")
         hintsAdapter = CountriesListAdapter(viewModel.hintCountries.value ?: emptyList())
 
-        viewModel.hintCountries.observe(viewLifecycleOwner, Observer {
+        viewModel.hintCountries.observe(this, Observer {
             hintsAdapter.countries = it ?: emptyList()
             hintsAdapter.notifyDataSetChanged()
         })
