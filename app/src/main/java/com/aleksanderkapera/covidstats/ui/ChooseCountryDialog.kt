@@ -8,8 +8,6 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,7 +36,7 @@ class ChooseCountryDialog : DialogFragment() {
 
         hintsAdapter = CountriesListAdapter(viewModel.hintCountries.value ?: emptyList())
 
-        viewModel.hintCountries.observe(this, Observer {
+        viewModel.hintCountries.observe(viewLifecycleOwner, Observer {
             hintsAdapter.countries = it ?: emptyList()
             hintsAdapter.notifyDataSetChanged()
         })
@@ -89,7 +87,7 @@ class ChooseCountryDialog : DialogFragment() {
                             hintsAdapter.clickedCountries.toList(),
                             R.string.prefs_chosen_countries.asString()
                         )
-                        viewModel.updateStats()
+//                        viewModel.updateStats()
                         viewModel.onPositiveButtonClick()
                         resetHints()
                     })
@@ -105,6 +103,6 @@ class ChooseCountryDialog : DialogFragment() {
     }
 
     private fun resetHints() {
-//        viewModel.hintCountries.value = viewModel.countries.value
+        viewModel.hintCountries.value = viewModel.countries.value
     }
 }
