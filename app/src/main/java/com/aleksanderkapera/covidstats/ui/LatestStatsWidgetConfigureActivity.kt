@@ -9,17 +9,15 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
-import com.aleksanderkapera.covidstats.repository.StatsRepository
-import com.aleksanderkapera.covidstats.room.StatsDatabase
+import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
+import com.aleksanderkapera.covidstats.util.InjectorUtils
+import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
 import com.aleksanderkapera.covidstats.viewmodel.ChooseCountryDialogViewModel
-import com.aleksanderkapera.covidstats.viewmodel.ChooseCountryDialogViewModelFactory
 
 class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
-    private val database = StatsDatabase.getInstance(CovidStatsApp.context)
-    private val repository = StatsRepository.getInstance(database)
     private lateinit var viewModel: ChooseCountryDialogViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,10 +25,10 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(
             this,
-            ChooseCountryDialogViewModelFactory(repository)
+            InjectorUtils.provideChooseCountryDialogViewModelFactory(CovidStatsApp.context)
         ).get(ChooseCountryDialogViewModel::class.java)
 
-        ChooseCountryDialog().show(
+        ChooseCountryDialog(ChooseCountryDialog.Mode.WIDGET).show(
             supportFragmentManager,
             R.string.dialog_choose_country.asString()
         )
@@ -43,6 +41,21 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
 
         viewModel.onPositiveButtonClickEvent.observe(this, Observer { isClicked ->
             if (isClicked) {
+                val countryToDisplay =
+                    SharedPrefsManager.getList<AllStatusStatisticTable>(R.string.prefs_latest_stats.asString())
+                        ?.find { statistic ->
+                            viewModel.clickedCountries.value?.find { country ->
+                                statistic.countryCode == country.iso2
+                            } != null
+                        }
+                countryToDisplay?.let {
+                    SharedPrefsManager.put<AllStatusStatisticTable>(
+                        countryToDisplay,
+                        R.string.prefs_widget_content.asString() + appWidgetId
+                    )
+                    LatestStatsWidget.sendRefreshWidgetIntent()
+                }
+
                 viewModel.finishOnPositiveButtonClick()
                 close()
             }

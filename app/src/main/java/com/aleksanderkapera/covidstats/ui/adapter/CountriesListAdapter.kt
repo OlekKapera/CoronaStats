@@ -5,23 +5,29 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.domain.Country
+import com.aleksanderkapera.covidstats.ui.ChooseCountryDialog
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
 import kotlinx.android.synthetic.main.item_country.view.*
 
-class CountriesListAdapter(var countries: List<Country>) :
+class CountriesListAdapter(
+    var countries: List<Country>,
+    private val mode: ChooseCountryDialog.Mode
+) :
     RecyclerView.Adapter<CountriesListAdapter.ViewHolder>() {
 
-    val clickedCountries = mutableSetOf<Country>()
+    val clickedCountries = MutableLiveData(mutableSetOf<Country>())
 
     init {
-        SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
-            ?.let { countries ->
-                clickedCountries.addAll(countries)
-            }
+        if (mode == ChooseCountryDialog.Mode.FULL)
+            SharedPrefsManager.getList<Country>(R.string.prefs_chosen_countries.asString())
+                ?.let { countries ->
+                    clickedCountries.value?.addAll(countries)
+                }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,7 +42,9 @@ class CountriesListAdapter(var countries: List<Country>) :
         val country = countries[position]
         holder.text.text = country.countryName
 
-        holder.image.visibility = if (country in clickedCountries) View.VISIBLE else View.GONE
+        if (mode == ChooseCountryDialog.Mode.FULL)
+            holder.image.visibility =
+                if (clickedCountries.value?.contains(country) == true) View.VISIBLE else View.GONE
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
@@ -48,14 +56,17 @@ class CountriesListAdapter(var countries: List<Country>) :
         }
 
         override fun onClick(view: View?) {
+            val priorClicks = clickedCountries.value
+
             if (image.visibility == View.VISIBLE) {
-                clickedCountries.removeIf { it.countryName == text.text }
+                priorClicks?.removeIf { it.countryName == text.text }
                 image.visibility = View.GONE
             } else {
-                clickedCountries.add(countries.find { it.countryName == text.text }
+                priorClicks?.add(countries.find { it.countryName == text.text }
                     ?: throw Exception("No country in database!"))
                 image.visibility = View.VISIBLE
             }
+            clickedCountries.value = priorClicks
         }
     }
 }

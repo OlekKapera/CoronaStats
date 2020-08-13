@@ -94,7 +94,7 @@ class MainFragment : Fragment() {
             return@setOnMenuItemClickListener when (item.itemId) {
                 // Open dialog to choose countries to be displayed
                 R.id.mainFragment_menu_add -> {
-                    ChooseCountryDialog().show(
+                    ChooseCountryDialog(ChooseCountryDialog.Mode.FULL).show(
                         parentFragmentManager,
                         R.string.dialog_choose_country.asString()
                     )

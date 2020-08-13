@@ -21,7 +21,7 @@ import com.aleksanderkapera.covidstats.util.asString
 import com.aleksanderkapera.covidstats.viewmodel.ChooseCountryDialogViewModel
 import kotlinx.android.synthetic.main.dialog_choose_country.view.*
 
-class ChooseCountryDialog : DialogFragment() {
+class ChooseCountryDialog(private val mode: Mode) : DialogFragment() {
 
     private lateinit var viewModel: ChooseCountryDialogViewModel
 
@@ -35,11 +35,22 @@ class ChooseCountryDialog : DialogFragment() {
         ).get(ChooseCountryDialogViewModel::class.java)
 
         viewModel.getCountriesByName("")
-        hintsAdapter = CountriesListAdapter(viewModel.hintCountries.value ?: emptyList())
+        hintsAdapter =
+            CountriesListAdapter(
+                viewModel.hintCountries.value ?: emptyList(),
+                mode
+            )
 
         viewModel.hintCountries.observe(this, Observer {
             hintsAdapter.countries = it ?: emptyList()
             hintsAdapter.notifyDataSetChanged()
+        })
+
+        hintsAdapter.clickedCountries.observe(this, Observer { clickedCountries ->
+            viewModel.clickedCountries.value = clickedCountries
+            if (mode == Mode.WIDGET && clickedCountries.isNotEmpty()) {
+                viewModel.onPositiveButtonClick()
+            }
         })
 
         return activity?.let { activity ->
@@ -81,23 +92,26 @@ class ChooseCountryDialog : DialogFragment() {
             }
 
             builder.setView(view)
-                .setPositiveButton(
+
+            if (mode == Mode.FULL) {
+                builder.setPositiveButton(
                     R.string.ok,
                     DialogInterface.OnClickListener { dialogInterface, i ->
                         SharedPrefsManager.putList<Country>(
-                            hintsAdapter.clickedCountries.toList(),
+                            hintsAdapter.clickedCountries.value?.toList() ?: listOf(),
                             R.string.prefs_chosen_countries.asString()
                         )
 //                        viewModel.updateStats()
                         viewModel.onPositiveButtonClick()
                         resetHints()
                     })
-                .setNegativeButton(
-                    R.string.cancel,
-                    DialogInterface.OnClickListener { dialogInterface, i ->
-                        dialogInterface.cancel()
-                        resetHints()
-                    })
+                    .setNegativeButton(
+                        R.string.cancel,
+                        DialogInterface.OnClickListener { dialogInterface, i ->
+                            dialogInterface.cancel()
+                            resetHints()
+                        })
+            }
 
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
@@ -105,5 +119,9 @@ class ChooseCountryDialog : DialogFragment() {
 
     private fun resetHints() {
         viewModel.hintCountries.value = viewModel.countries.value
+    }
+
+    enum class Mode {
+        FULL, WIDGET
     }
 }

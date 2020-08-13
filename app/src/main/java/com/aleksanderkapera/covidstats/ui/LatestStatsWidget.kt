@@ -21,22 +21,21 @@ import com.aleksanderkapera.covidstats.util.asString
  */
 class LatestStatsWidget : AppWidgetProvider() {
 
-    private lateinit var stats: List<AllStatusStatisticTable>
+    private var statistic: AllStatusStatisticTable? = null
 
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
-        stats =
-            SharedPrefsManager.getList<AllStatusStatisticTable>(R.string.prefs_latest_stats.asString())
-                ?: listOf()
-
         // There may be multiple widgets active, so update all of them
         for (appWidgetId in appWidgetIds) {
+            statistic =
+                SharedPrefsManager.get<AllStatusStatisticTable>(R.string.prefs_widget_content.asString() + appWidgetId)
+
             updateAppWidget(
                 context,
-                stats,
+                statistic,
                 appWidgetManager,
                 appWidgetId
             )
@@ -55,7 +54,7 @@ class LatestStatsWidget : AppWidgetProvider() {
 
         internal fun updateAppWidget(
             context: Context,
-            stats: List<AllStatusStatisticTable>?,
+            statistic: AllStatusStatisticTable?,
             appWidgetManager: AppWidgetManager,
             appWidgetId: Int
         ) {
@@ -63,9 +62,6 @@ class LatestStatsWidget : AppWidgetProvider() {
                 context.packageName,
                 R.layout.widget_latest_stats
             )
-
-            val statistic = stats?.get(0)
-
             statistic?.let {
                 views.apply {
                     setTextViewText(R.id.widget_text_newMain, statistic.confirmed.toString())
@@ -98,7 +94,12 @@ class LatestStatsWidget : AppWidgetProvider() {
             // Send a broadcast so that the Operating system updates the widget
             val man = AppWidgetManager.getInstance(CovidStatsApp.context)
             val ids =
-                man.getAppWidgetIds(ComponentName(CovidStatsApp.context, LatestStatsWidget::class.java))
+                man.getAppWidgetIds(
+                    ComponentName(
+                        CovidStatsApp.context,
+                        LatestStatsWidget::class.java
+                    )
+                )
             val updateIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
             updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
             CovidStatsApp.context.sendBroadcast(updateIntent)

@@ -12,6 +12,7 @@ class ChooseCountryDialogViewModel(private val repository: StatsRepository) : Vi
 
     val hintCountries = MutableLiveData<List<Country>?>()
     val countries = repository.countries
+    val clickedCountries = MutableLiveData(mutableSetOf<Country>())
 
     private val _onPositiveButtonClickEvent = MutableLiveData<Boolean>()
     val onPositiveButtonClickEvent: LiveData<Boolean>
