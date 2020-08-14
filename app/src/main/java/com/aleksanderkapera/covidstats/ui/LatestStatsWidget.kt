@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import com.aleksanderkapera.covidstats.CovidStatsApp
-import com.aleksanderkapera.covidstats.CovidStatsApp.Companion.context
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
 import com.aleksanderkapera.covidstats.service.WidgetIntentService
@@ -54,7 +53,6 @@ class LatestStatsWidget : AppWidgetProvider() {
     companion object {
 
         private val areSpinning: HashMap<Int, Boolean> = hashMapOf()
-        private var spin = false
 
         internal fun updateAppWidget(
             context: Context,
@@ -78,13 +76,13 @@ class LatestStatsWidget : AppWidgetProvider() {
                     )
                     setOnClickPendingIntent(
                         R.id.widget_image_refresh,
-                        startService(context, appWidgetId, views)
+                        startService(context, appWidgetId)
                     )
                     setProgressBar(
                         R.id.widget_image_refresh,
                         100,
                         0,
-                        spin
+                        areSpinning[appWidgetId] == true
                     )
                 }
             }
@@ -93,12 +91,11 @@ class LatestStatsWidget : AppWidgetProvider() {
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
 
-        private fun startService(context: Context, id: Int, views: RemoteViews): PendingIntent {
-            areSpinning[id] = areSpinning[id]?.not() ?: true
-
+        private fun startService(context: Context, id: Int): PendingIntent {
             val intent = Intent(context, WidgetIntentService::class.java)
             intent.action = SERVICE_WIDGET_INTENT
-            return PendingIntent.getService(context, 100, intent, 0)
+            intent.putExtra(R.string.intent_refresh_id.asString(), id)
+            return PendingIntent.getService(context, id, intent, 0)
         }
 
         /**
@@ -119,12 +116,12 @@ class LatestStatsWidget : AppWidgetProvider() {
             CovidStatsApp.context.sendBroadcast(updateIntent)
         }
 
-        fun startSpinner(){
-            spin = true
+        fun startSpinner(widgetId: Int) {
+            areSpinning[widgetId] = true
         }
 
-        fun stopSpinner(){
-            spin = false
+        fun stopSpinner(widgetId: Int) {
+            areSpinning[widgetId] = false
         }
     }
 }
