@@ -8,9 +8,13 @@ import com.aleksanderkapera.covidstats.viewmodel.MainFragmentViewModelFactory
 
 object InjectorUtils {
 
+    fun getStatsDatabase(context: Context): StatsDatabase {
+        return StatsDatabase.getInstance(context)
+    }
+
     private fun getStatsRepository(context: Context): StatsRepository {
         return StatsRepository.getInstance(
-            StatsDatabase.getInstance(context.applicationContext)
+            getStatsDatabase(context)
         )
     }
 

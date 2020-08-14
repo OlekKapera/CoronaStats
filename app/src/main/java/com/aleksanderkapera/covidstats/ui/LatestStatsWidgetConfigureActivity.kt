@@ -7,9 +7,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.aleksanderkapera.covidstats.CovidStatsApp
+import com.aleksanderkapera.covidstats.CovidStatsApp.Companion.context
 import com.aleksanderkapera.covidstats.R
+import com.aleksanderkapera.covidstats.domain.asDatabaseModel
 import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
+import com.aleksanderkapera.covidstats.room.asDomainModel
 import com.aleksanderkapera.covidstats.util.InjectorUtils
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
@@ -28,7 +30,7 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(
             this,
-            InjectorUtils.provideChooseCountryDialogViewModelFactory(CovidStatsApp.context)
+            InjectorUtils.provideChooseCountryDialogViewModelFactory(context)
         ).get(ChooseCountryDialogViewModel::class.java)
 
         ChooseCountryDialog(ChooseCountryDialog.Mode.WIDGET).show(
@@ -60,8 +62,14 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
                         withContext(Dispatchers.Default) {
                             updateWidgetSharedPrefs(
                                 viewModel.fetchNewCountry(
-                                    latestStats
-                                )
+                                    latestStats.map {
+                                        it.asDomainModel(
+                                            InjectorUtils.getStatsDatabase(
+                                                context
+                                            )
+                                        )
+                                    }
+                                )?.asDatabaseModel()
                             )
                         }
                     }
@@ -76,6 +84,9 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
         setResult(Activity.RESULT_CANCELED)
     }
 
+    /**
+     * Correctly exit activity
+     */
     private fun close() {
         val resultValue = Intent()
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -83,6 +94,9 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
         finish()
     }
 
+    /**
+     * Puts new data for current widget
+     */
     private fun updateWidgetSharedPrefs(country: AllStatusStatisticTable?) {
         country?.let {
             SharedPrefsManager.put<AllStatusStatisticTable>(

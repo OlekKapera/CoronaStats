@@ -111,12 +111,6 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
             viewModelScope.launch {
                 val statsList = mutableListOf<LiveData<AllStatusStatistic>?>()
                 countries.forEach { country ->
-                    val dates =
-                        mutableListOf(
-                            lastSavedDate.find { it.countrySlug == country.slug }?.date ?: 0L
-                        )
-                    dates.add(dates[0].minus(DAY_IN_MILLIS))
-
                     val lastStats = repository.getLastStatsCombined(
                         country
                     )
