@@ -14,6 +14,9 @@ import com.aleksanderkapera.covidstats.util.InjectorUtils
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
 import com.aleksanderkapera.covidstats.viewmodel.ChooseCountryDialogViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
 
@@ -41,23 +44,32 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
 
         viewModel.onPositiveButtonClickEvent.observe(this, Observer { isClicked ->
             if (isClicked) {
-                val countryToDisplay =
-                    SharedPrefsManager.getList<AllStatusStatisticTable>(R.string.prefs_latest_stats.asString())
-                        ?.find { statistic ->
+                runBlocking {
+                    val latestStats =
+                        SharedPrefsManager.getList<AllStatusStatisticTable>(R.string.prefs_latest_stats.asString())
+                            ?: listOf()
+                    val countryToDisplay =
+                        latestStats.find { statistic ->
                             viewModel.clickedCountries.value?.find { country ->
                                 statistic.countryCode == country.iso2
                             } != null
                         }
-                countryToDisplay?.let {
-                    SharedPrefsManager.put<AllStatusStatisticTable>(
-                        countryToDisplay,
-                        R.string.prefs_widget_content.asString() + appWidgetId
-                    )
+                    countryToDisplay?.let {
+                        updateWidgetSharedPrefs(countryToDisplay)
+                    }.also {
+                        withContext(Dispatchers.Default) {
+                            updateWidgetSharedPrefs(
+                                viewModel.fetchNewCountry(
+                                    latestStats
+                                )
+                            )
+                        }
+                    }
                     LatestStatsWidget.sendRefreshWidgetIntent()
-                }
 
-                viewModel.finishOnPositiveButtonClick()
-                close()
+                    viewModel.finishOnPositiveButtonClick()
+                    close()
+                }
             }
         })
 
@@ -69,5 +81,14 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         setResult(RESULT_OK, resultValue)
         finish()
+    }
+
+    private fun updateWidgetSharedPrefs(country: AllStatusStatisticTable?) {
+        country?.let {
+            SharedPrefsManager.put<AllStatusStatisticTable>(
+                it,
+                R.string.prefs_widget_content.asString() + appWidgetId
+            )
+        }
     }
 }
