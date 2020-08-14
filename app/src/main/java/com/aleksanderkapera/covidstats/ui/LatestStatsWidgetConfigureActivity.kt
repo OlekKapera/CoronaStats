@@ -56,9 +56,9 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
                                 statistic.countryCode == country.iso2
                             } != null
                         }
-                    countryToDisplay?.let {
+                    if (countryToDisplay != null)
                         updateWidgetSharedPrefs(countryToDisplay)
-                    }.also {
+                    else {
                         withContext(Dispatchers.Default) {
                             updateWidgetSharedPrefs(
                                 viewModel.fetchNewCountry(
