@@ -2,10 +2,13 @@ package com.aleksanderkapera.covidstats.service
 
 import android.app.IntentService
 import android.content.Intent
+import android.util.Log
 import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.repository.StatsRepository
 import com.aleksanderkapera.covidstats.room.StatsDatabase
 import com.aleksanderkapera.covidstats.ui.LatestStatsWidget.Companion.sendRefreshWidgetIntent
+import com.aleksanderkapera.covidstats.ui.LatestStatsWidget.Companion.startSpinner
+import com.aleksanderkapera.covidstats.ui.LatestStatsWidget.Companion.stopSpinner
 import com.aleksanderkapera.covidstats.util.SERVICE_WIDGET_INTENT
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,8 +26,13 @@ class WidgetIntentService : IntentService(SERVICE_WIDGET_INTENT) {
         if (intent?.action == SERVICE_WIDGET_INTENT) {
             scope.launch {
                 try {
+                    startSpinner()
+                    sendRefreshWidgetIntent()
                     repository.updateStats()
+                } catch (t: Throwable) {
+                    Log.e(WidgetIntentService::class.simpleName, t.toString())
                 } finally {
+                    stopSpinner()
                     sendRefreshWidgetIntent()
                 }
             }

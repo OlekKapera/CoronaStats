@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import com.aleksanderkapera.covidstats.CovidStatsApp
+import com.aleksanderkapera.covidstats.CovidStatsApp.Companion.context
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
 import com.aleksanderkapera.covidstats.service.WidgetIntentService
@@ -52,6 +53,9 @@ class LatestStatsWidget : AppWidgetProvider() {
 
     companion object {
 
+        private val areSpinning: HashMap<Int, Boolean> = hashMapOf()
+        private var spin = false
+
         internal fun updateAppWidget(
             context: Context,
             statistic: AllStatusStatisticTable?,
@@ -72,16 +76,26 @@ class LatestStatsWidget : AppWidgetProvider() {
                         R.id.widget_text_date,
                         DateStandardConverter.print(statistic.date)
                     )
+                    setOnClickPendingIntent(
+                        R.id.widget_image_refresh,
+                        startService(context, appWidgetId, views)
+                    )
+                    setProgressBar(
+                        R.id.widget_image_refresh,
+                        100,
+                        0,
+                        spin
+                    )
                 }
             }
-
-            views.setOnClickPendingIntent(R.id.widget_image_refresh, startService(context))
 
             // Instruct the widget manager to update the widget
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
 
-        private fun startService(context: Context): PendingIntent {
+        private fun startService(context: Context, id: Int, views: RemoteViews): PendingIntent {
+            areSpinning[id] = areSpinning[id]?.not() ?: true
+
             val intent = Intent(context, WidgetIntentService::class.java)
             intent.action = SERVICE_WIDGET_INTENT
             return PendingIntent.getService(context, 100, intent, 0)
@@ -103,6 +117,14 @@ class LatestStatsWidget : AppWidgetProvider() {
             val updateIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
             updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
             CovidStatsApp.context.sendBroadcast(updateIntent)
+        }
+
+        fun startSpinner(){
+            spin = true
+        }
+
+        fun stopSpinner(){
+            spin = false
         }
     }
 }
