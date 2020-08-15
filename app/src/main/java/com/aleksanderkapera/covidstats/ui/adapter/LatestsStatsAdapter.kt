@@ -1,15 +1,12 @@
 package com.aleksanderkapera.covidstats.ui.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
-import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.databinding.ViewLatestStatsBinding
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 
-class LatestStatsAdapter(var todayStats: MutableList<LiveData<AllStatusStatistic>?>) :
+class LatestStatsAdapter(var todayStats: List<AllStatusStatistic>) :
     RecyclerView.Adapter<LatestStatsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,7 +29,7 @@ class LatestStatsAdapter(var todayStats: MutableList<LiveData<AllStatusStatistic
     inner class ViewHolder(private val itemBinding: ViewLatestStatsBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
 
-        fun bind(data: LiveData<AllStatusStatistic>?) {
+        fun bind(data: AllStatusStatistic) {
             itemBinding.data = data
         }
     }

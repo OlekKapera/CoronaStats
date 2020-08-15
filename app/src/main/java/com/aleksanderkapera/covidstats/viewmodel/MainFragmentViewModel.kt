@@ -5,12 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.domain.asDatabaseModel
 import com.aleksanderkapera.covidstats.repository.StatsRepository
 import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
+import com.aleksanderkapera.covidstats.room.asDomainModel
 import com.aleksanderkapera.covidstats.ui.LatestStatsWidget.Companion.sendRefreshWidgetIntent
 import com.aleksanderkapera.covidstats.ui.MainFragment
 import com.aleksanderkapera.covidstats.util.*
@@ -21,6 +23,8 @@ import kotlinx.coroutines.launch
  * ViewModel for [MainFragment]
  */
 class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel() {
+
+    private val database = InjectorUtils.getStatsDatabase(CovidStatsApp.context)
 
     val userCountries =
         LiveSharedPreferences.getObjectList<Country>(R.string.prefs_chosen_countries.asString())
@@ -34,11 +38,10 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
         get() = _loadingEvent
 
     val statistics = repository.stats
-
     val countries = repository.countries
 
-    private val _todayStats = MutableLiveData<MutableList<LiveData<AllStatusStatistic>?>>()
-    val todayStats: LiveData<MutableList<LiveData<AllStatusStatistic>?>>
+    private val _todayStats = MutableLiveData<List<AllStatusStatistic>>()
+    val todayStats: LiveData<List<AllStatusStatistic>>
         get() = _todayStats
 
     private val lastSavedDate =
@@ -80,7 +83,7 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
      */
     fun updateLastFetchedDate() {
         _todayStats.value?.forEach { liveStats ->
-            liveStats?.value?.let { stats ->
+            liveStats.let { stats ->
                 lastSavedDate.find { it.countrySlug == stats.country.slug }.also { pref ->
                     if (pref != null)
                         pref.date = stats.date.millis
@@ -105,11 +108,15 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
      * Updates latest stats
      */
     fun updateTodayStats() {
+        val oldList: List<AllStatusStatistic>? =
+            if (_todayStats.value != null) _todayStats.value else
+                SharedPrefsManager.getList<AllStatusStatisticTable>(R.string.prefs_latest_stats.asString())
+                    ?.map { it.asDomainModel(database) }
+
         userCountries.value?.let { countries ->
-            _todayStats.value = mutableListOf()
 
             viewModelScope.launch {
-                val statsList = mutableListOf<LiveData<AllStatusStatistic>?>()
+                val statsList = mutableListOf<AllStatusStatistic>()
                 countries.forEach { country ->
                     val lastStats = repository.getLastStatsCombined(
                         country
@@ -124,13 +131,18 @@ class MainFragmentViewModel(private val repository: StatsRepository) : ViewModel
                         lastStats[0].deaths -= lastStats[1].deaths
                         lastStats[0].recovered -= lastStats[1].recovered
 
-                        statsList.add(MutableLiveData(lastStats[0]))
+                        statsList.add(lastStats[0])
                     }
+                }
+                // merge old list with newly updated data
+                oldList?.forEach { oldStats ->
+                    if (statsList.find { newStats -> newStats.country.slug == oldStats.country.slug } == null)
+                        statsList.add(oldStats)
                 }
                 _todayStats.value = statsList
 
                 SharedPrefsManager.putList<AllStatusStatisticTable?>(
-                    statsList.map { it?.value?.asDatabaseModel() },
+                    statsList.map { it.asDatabaseModel() },
                     R.string.prefs_latest_stats.asString()
                 )
 

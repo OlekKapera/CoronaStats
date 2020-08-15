@@ -116,6 +116,18 @@ class LatestStatsWidget : AppWidgetProvider() {
             CovidStatsApp.context.sendBroadcast(updateIntent)
         }
 
+        /**
+         * Update stored preferences regarding content of a widget with [todayStats]
+         */
+        fun updateDisplayableStats(widgetId: Int, todayStats: AllStatusStatisticTable?) {
+            todayStats?.let {
+                SharedPrefsManager.put<AllStatusStatisticTable>(
+                    todayStats,
+                    R.string.prefs_widget_content.asString() + widgetId
+                )
+            }
+        }
+
         fun startSpinner(widgetId: Int) {
             areSpinning[widgetId] = true
         }

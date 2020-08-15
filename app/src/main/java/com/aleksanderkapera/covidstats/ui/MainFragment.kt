@@ -58,7 +58,7 @@ class MainFragment : Fragment() {
             viewModel = mainViewModel
         }
 
-        recyclerAdapter = LatestStatsAdapter(mainViewModel.todayStats.value ?: mutableListOf())
+        recyclerAdapter = LatestStatsAdapter(mainViewModel.todayStats.value ?: listOf())
         initObservers()
 
         mainViewModel.exceptionCaughtEvent.observe(

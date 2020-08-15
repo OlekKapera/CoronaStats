@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.databinding.ViewLatestStatsBinding
 import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
@@ -27,7 +26,7 @@ class LatestStatsView @JvmOverloads constructor(
     /**
      * Setting data binding variable
      */
-    fun setData(data: LiveData<AllStatusStatistic>?) {
+    fun setData(data: AllStatusStatistic) {
         binding.data = data
     }
 }

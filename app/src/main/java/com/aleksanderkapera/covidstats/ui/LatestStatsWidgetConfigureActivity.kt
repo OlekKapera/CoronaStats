@@ -97,8 +97,8 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
     /**
      * Puts new data for current widget
      */
-    private fun updateWidgetSharedPrefs(country: AllStatusStatisticTable?) {
-        country?.let {
+    private fun updateWidgetSharedPrefs(todayStatistics: AllStatusStatisticTable?) {
+        todayStatistics?.let {
             SharedPrefsManager.put<AllStatusStatisticTable>(
                 it,
                 R.string.prefs_widget_content.asString() + appWidgetId
