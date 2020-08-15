@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.widget.RemoteViews
 import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
@@ -76,7 +77,7 @@ class LatestStatsWidget : AppWidgetProvider() {
                     )
                     setOnClickPendingIntent(
                         R.id.widget_image_refresh,
-                        startService(context, appWidgetId)
+                        startService(context, appWidgetId, statistic.countryCode)
                     )
                     setProgressBar(
                         R.id.widget_image_refresh,
@@ -91,10 +92,14 @@ class LatestStatsWidget : AppWidgetProvider() {
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
 
-        private fun startService(context: Context, id: Int): PendingIntent {
+        private fun startService(context: Context, id: Int, countryCode: String): PendingIntent {
             val intent = Intent(context, WidgetIntentService::class.java)
             intent.action = SERVICE_WIDGET_INTENT
-            intent.putExtra(R.string.intent_refresh_id.asString(), id)
+            val bundle = Bundle().apply {
+                putInt(R.string.intent_refresh_id.asString(), id)
+                putString(R.string.intent_refresh_countryCode.asString(), countryCode)
+            }
+            intent.putExtras(bundle)
             return PendingIntent.getService(context, id, intent, 0)
         }
 

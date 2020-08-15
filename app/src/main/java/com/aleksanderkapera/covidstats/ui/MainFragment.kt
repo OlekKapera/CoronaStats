@@ -131,7 +131,8 @@ class MainFragment : Fragment() {
         })
 
         mainViewModel.todayStats.observe(viewLifecycleOwner, Observer { todayStats ->
-            recyclerAdapter.todayStats = todayStats
+            recyclerAdapter.todayStats =
+                todayStats.filter { mainViewModel.userCountries.value?.contains(it.country) == true }
             recyclerAdapter.notifyDataSetChanged()
 
             mainViewModel.updateLastFetchedDate()
