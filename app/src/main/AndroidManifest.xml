@@ -12,6 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service
+            android:name=".service.WidgetService"
+            android:enabled="true"
+            android:exported="true"/>
+
         <receiver android:name=".ui.LatestStatsWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -24,7 +29,8 @@
 
         <service
             android:name=".service.WidgetIntentService"
-            android:exported="false" />
+            android:enabled="true"
+            android:foregroundServiceType="dataSync" />
 
         <activity android:name=".ui.MainActivity">
             <intent-filter>
@@ -33,9 +39,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.LatestStatsWidgetConfigureActivity"
             android:theme="@style/Theme.Transparent" />
     </application>
+
 </manifest>

@@ -6,14 +6,19 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
+import android.content.ServiceConnection
+import android.os.IBinder
+import android.os.Message
+import android.os.Messenger
+import android.os.RemoteException
+import android.util.Log
 import android.widget.RemoteViews
 import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
-import com.aleksanderkapera.covidstats.service.WidgetIntentService
+import com.aleksanderkapera.covidstats.service.WidgetService
 import com.aleksanderkapera.covidstats.util.DateStandardConverter
-import com.aleksanderkapera.covidstats.util.SERVICE_WIDGET_INTENT
+import com.aleksanderkapera.covidstats.util.MSG_REFRESH_WIDGET
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
 
@@ -23,6 +28,22 @@ import com.aleksanderkapera.covidstats.util.asString
 class LatestStatsWidget : AppWidgetProvider() {
 
     private var statistic: AllStatusStatisticTable? = null
+    private var mService: Messenger? = null
+    private var isBound: Boolean = true
+
+    private val mConnection = object : ServiceConnection {
+        override fun onServiceDisconnected(className: ComponentName?) {
+            Log.d(LatestStatsWidget::class.simpleName, "Service disconnected")
+            mService = null
+            isBound = false
+        }
+
+        override fun onServiceConnected(className: ComponentName?, service: IBinder?) {
+            Log.d(LatestStatsWidget::class.simpleName, "Service connected")
+            mService = Messenger(service)
+            isBound = true
+        }
+    }
 
     override fun onUpdate(
         context: Context,
@@ -51,57 +72,74 @@ class LatestStatsWidget : AppWidgetProvider() {
         }
     }
 
+    private fun updateAppWidget(
+        context: Context,
+        statistic: AllStatusStatisticTable?,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int
+    ) {
+        val views = RemoteViews(
+            context.packageName,
+            R.layout.widget_latest_stats
+        )
+        Intent(context, WidgetService::class.java).also { intent ->
+            context.applicationContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
+        }
+
+        statistic?.let {
+            views.apply {
+                setTextViewText(R.id.widget_text_newMain, statistic.confirmed.toString())
+                setTextViewText(R.id.widget_text_deathsMain, statistic.deaths.toString())
+                setTextViewText(R.id.widget_text_recoveredMain, statistic.recovered.toString())
+                setTextViewText(R.id.widget_text_country, statistic.countryName)
+                setTextViewText(
+                    R.id.widget_text_date,
+                    DateStandardConverter.print(statistic.date)
+                )
+                setOnClickPendingIntent(
+                    R.id.widget_image_refresh,
+                    startService(context, appWidgetId, statistic.countryCode)
+                )
+                setProgressBar(
+                    R.id.widget_image_refresh,
+                    100,
+                    0,
+                    areSpinning[appWidgetId] == true
+                )
+            }
+        }
+
+        // Instruct the widget manager to update the widget
+        appWidgetManager.updateAppWidget(appWidgetId, views)
+    }
+
+    private fun callRefreshService() {
+        if (!isBound) return
+        val msg: Message = Message.obtain(null, MSG_REFRESH_WIDGET, 0, 0)
+        try {
+            mService?.send(msg)
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun startService(context: Context, id: Int, countryCode: String): PendingIntent {
+//        val intent = Intent(context, WidgetIntentService::class.java)
+//        intent.action = SERVICE_WIDGET_INTENT
+//        intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+//        val bundle = Bundle().apply {
+//            putInt(R.string.intent_refresh_id.asString(), id)
+//            putString(R.string.intent_refresh_countryCode.asString(), countryCode)
+//        }
+//        intent.putExtras(bundle)
+//        return PendingIntent.getService(context, id, intent, Intent.FILL_IN_DATA)
+        callRefreshService()
+        val intent = Intent(context, WidgetService::class.java)
+        return PendingIntent.getService(context, 0, intent, 0)
+    }
+
     companion object {
-
         private val areSpinning: HashMap<Int, Boolean> = hashMapOf()
-
-        internal fun updateAppWidget(
-            context: Context,
-            statistic: AllStatusStatisticTable?,
-            appWidgetManager: AppWidgetManager,
-            appWidgetId: Int
-        ) {
-            val views = RemoteViews(
-                context.packageName,
-                R.layout.widget_latest_stats
-            )
-            statistic?.let {
-                views.apply {
-                    setTextViewText(R.id.widget_text_newMain, statistic.confirmed.toString())
-                    setTextViewText(R.id.widget_text_deathsMain, statistic.deaths.toString())
-                    setTextViewText(R.id.widget_text_recoveredMain, statistic.recovered.toString())
-                    setTextViewText(R.id.widget_text_country, statistic.countryName)
-                    setTextViewText(
-                        R.id.widget_text_date,
-                        DateStandardConverter.print(statistic.date)
-                    )
-                    setOnClickPendingIntent(
-                        R.id.widget_image_refresh,
-                        startService(context, appWidgetId, statistic.countryCode)
-                    )
-                    setProgressBar(
-                        R.id.widget_image_refresh,
-                        100,
-                        0,
-                        areSpinning[appWidgetId] == true
-                    )
-                }
-            }
-
-            // Instruct the widget manager to update the widget
-            appWidgetManager.updateAppWidget(appWidgetId, views)
-        }
-
-        private fun startService(context: Context, id: Int, countryCode: String): PendingIntent {
-            val intent = Intent(context, WidgetIntentService::class.java)
-            intent.action = SERVICE_WIDGET_INTENT
-            val bundle = Bundle().apply {
-                putInt(R.string.intent_refresh_id.asString(), id)
-                putString(R.string.intent_refresh_countryCode.asString(), countryCode)
-            }
-            intent.putExtras(bundle)
-            return PendingIntent.getService(context, id, intent, 0)
-        }
 
         /**
          * Send intent to widget to update its data

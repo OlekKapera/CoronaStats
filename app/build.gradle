@@ -86,7 +86,7 @@ dependencies {
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 
     // WorkManager
-    implementation "android.arch.work:work-runtime-ktx:$version_work"
+    implementation "android.arch.work:work-runtime-ktx:${version_work}"
 
     // Joda
     implementation 'net.danlew:android.joda:2.10.6'
