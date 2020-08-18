@@ -15,7 +15,7 @@
         <service
             android:name=".service.WidgetService"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true" />
 
         <receiver android:name=".ui.LatestStatsWidget">
             <intent-filter>
@@ -28,9 +28,10 @@
         </receiver>
 
         <service
-            android:name=".service.WidgetIntentService"
+            android:name="com.aleksanderkapera.covidstats.service.WidgetIntentService"
             android:enabled="true"
-            android:foregroundServiceType="dataSync" />
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity android:name=".ui.MainActivity">
             <intent-filter>

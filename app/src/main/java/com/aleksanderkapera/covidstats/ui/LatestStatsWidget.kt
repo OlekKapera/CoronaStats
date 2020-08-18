@@ -16,11 +16,8 @@ import android.widget.RemoteViews
 import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
-import com.aleksanderkapera.covidstats.service.WidgetService
-import com.aleksanderkapera.covidstats.util.DateStandardConverter
-import com.aleksanderkapera.covidstats.util.MSG_REFRESH_WIDGET
-import com.aleksanderkapera.covidstats.util.SharedPrefsManager
-import com.aleksanderkapera.covidstats.util.asString
+import com.aleksanderkapera.covidstats.service.WidgetIntentService
+import com.aleksanderkapera.covidstats.util.*
 
 /**
  * Implementation of App Widget functionality.
@@ -82,9 +79,9 @@ class LatestStatsWidget : AppWidgetProvider() {
             context.packageName,
             R.layout.widget_latest_stats
         )
-        Intent(context, WidgetService::class.java).also { intent ->
-            context.applicationContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
-        }
+//        Intent(context, WidgetService::class.java).also { intent ->
+//            context.applicationContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
+//        }
 
         statistic?.let {
             views.apply {
@@ -133,9 +130,16 @@ class LatestStatsWidget : AppWidgetProvider() {
 //        }
 //        intent.putExtras(bundle)
 //        return PendingIntent.getService(context, id, intent, Intent.FILL_IN_DATA)
-        callRefreshService()
-        val intent = Intent(context, WidgetService::class.java)
-        return PendingIntent.getService(context, 0, intent, 0)
+//        callRefreshService()
+        val intent = Intent(context, WidgetIntentService::class.java).apply {
+            action = SERVICE_WIDGET_INTENT
+            component = ComponentName(
+                "com.aleksanderkapera.covidstats",
+                "com.aleksanderkapera.covidstats.service.WidgetIntentService"
+            )
+        }
+//        WidgetIntentService.enqueueWork(context.applicationContext, intent)
+        return PendingIntent.getForegroundService(context, id, intent, 0)
     }
 
     companion object {

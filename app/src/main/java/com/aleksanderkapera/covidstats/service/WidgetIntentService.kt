@@ -1,8 +1,10 @@
 package com.aleksanderkapera.covidstats.service
 
-import android.app.IntentService
-import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.os.IBinder
+import androidx.core.app.JobIntentService
 import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.repository.StatsRepository
 import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
@@ -16,15 +18,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlin.random.Random
 
-class WidgetIntentService : IntentService(SERVICE_WIDGET_INTENT) {
+class WidgetIntentService : JobIntentService() {
 
     private val database = StatsDatabase.getInstance(CovidStatsApp.context)
     private val repository = StatsRepository.getInstance(database)
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
-    override fun onHandleIntent(intent: Intent?) {
-        val widgetId = 103
+    override fun getApplicationContext(): Context {
+        return super.getApplicationContext()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+    }
+
+    override fun onRebind(intent: Intent?) {
+        super.onRebind(intent)
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val widgetId = 105
         startSpinner(widgetId)
         if (intent?.action == SERVICE_WIDGET_INTENT) {
             val random = Random.nextInt(0, 420).toLong()
@@ -48,6 +62,79 @@ class WidgetIntentService : IntentService(SERVICE_WIDGET_INTENT) {
             )
             sendRefreshWidgetIntent()
         }
+        return super.onStartCommand(intent, flags, startId)
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+    }
+
+    override fun onStart(intent: Intent?, startId: Int) {
+        super.onStart(intent, startId)
+    }
+
+    override fun onBind(intent: Intent): IBinder? {
+        return super.onBind(intent)
+    }
+
+    override fun onHandleWork(intent: Intent) {
+        val widgetId = 105
+        startSpinner(widgetId)
+        if (intent.action == SERVICE_WIDGET_INTENT) {
+            val random = Random.nextInt(0, 420).toLong()
+            updateDisplayableStats(
+                widgetId,
+                AllStatusStatisticTable(
+                    0,
+                    1597536000000,
+                    "Poland",
+                    "PL",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    random,
+                    random,
+                    random,
+                    random
+                )
+            )
+            sendRefreshWidgetIntent()
+        }
+    }
+
+    companion object {
+        fun enqueueWork(context: Context, intent: Intent) {
+            enqueueWork(context, WidgetIntentService::class.java, 420, intent)
+        }
+    }
+
+//    override fun onHandleIntent(intent: Intent?) {
+//        val widgetId = 103
+//        startSpinner(widgetId)
+//        if (intent?.action == SERVICE_WIDGET_INTENT) {
+//            val random = Random.nextInt(0, 420).toLong()
+//            updateDisplayableStats(
+//                widgetId,
+//                AllStatusStatisticTable(
+//                    0,
+//                    1597536000000,
+//                    "Poland",
+//                    "PL",
+//                    "",
+//                    "",
+//                    "",
+//                    "",
+//                    "",
+//                    random,
+//                    random,
+//                    random,
+//                    random
+//                )
+//            )
+//            sendRefreshWidgetIntent()
+//        }
 
 //        if (intent?.action == SERVICE_WIDGET_INTENT) {
 //            val widgetId = intent.getIntExtra(R.string.intent_refresh_id.asString(), 0)
@@ -72,5 +159,5 @@ class WidgetIntentService : IntentService(SERVICE_WIDGET_INTENT) {
 //                }
 //            }
 //        }
-    }
+//    }
 }
