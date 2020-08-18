@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.widget.RemoteViews
 import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
@@ -90,29 +91,23 @@ class LatestStatsWidget : AppWidgetProvider() {
     }
 
     private fun startService(context: Context, id: Int, countryCode: String): PendingIntent {
-//        val intent = Intent(context, WidgetIntentService::class.java)
-//        intent.action = SERVICE_WIDGET_INTENT
-//        intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
-//        val bundle = Bundle().apply {
-//            putInt(R.string.intent_refresh_id.asString(), id)
-//            putString(R.string.intent_refresh_countryCode.asString(), countryCode)
-//        }
-//        intent.putExtras(bundle)
-//        return PendingIntent.getService(context, id, intent, Intent.FILL_IN_DATA)
-//        callRefreshService()
-        val intent = Intent(context, WidgetIntentService::class.java).apply {
+        val intent = Intent(context, WidgetIntentService::class.java)
+        val bundle = Bundle().apply {
+            putInt(R.string.intent_refresh_id.asString(), id)
+            putString(R.string.intent_refresh_countryCode.asString(), countryCode)
+        }
+        intent.apply {
+            putExtras(bundle)
             action = SERVICE_WIDGET_INTENT
             component = ComponentName(
                 "com.aleksanderkapera.covidstats",
                 "com.aleksanderkapera.covidstats.service.WidgetIntentService"
             )
         }
-
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             PendingIntent.getForegroundService(context, id, intent, 0)
-        } else {
+        else
             PendingIntent.getService(context, id, intent, 0)
-        }
     }
 
     companion object {
