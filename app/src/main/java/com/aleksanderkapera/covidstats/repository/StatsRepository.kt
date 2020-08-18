@@ -93,8 +93,10 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
 
                 }
             } finally {
-                if (userCountries != null)
-                    updateTodayStats(userCountries)
+                if (userCountries != null) {
+                    val todayStats = updateTodayStats(userCountries)
+                    updateLastFetchedDate(todayStats)
+                }
             }
         }
     }
@@ -243,24 +245,19 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
         return previousStats
     }
 
+    /**
+     * Updates shared preferences regarding last fetched date
+     */
     private fun updateLastFetchedDate(todayStats: List<AllStatusStatistic>) {
         val lastDates =
             SharedPrefsManager.getList<DateLastSavedStatsModel>(R.string.prefs_last_fetched_date.asString())
-                ?.toMutableList()
+                ?.toMutableList() ?: mutableListOf()
         todayStats.forEach { statistic ->
-            lastDates?.find { it.countrySlug == statistic.country.slug }.also { pref ->
-                if (pref != null)
-                    pref.date = statistic.date.millis
-                else
-                    lastDates?.add(
-                        DateLastSavedStatsModel(
-                            statistic.country.slug,
-                            statistic.date.millis
-                        )
-                    )
-            }
+            lastDates.removeIf { it.countrySlug == statistic.country.slug }
+            lastDates.add(DateLastSavedStatsModel(statistic.country.slug, statistic.date.millis))
         }
-        lastDates?.toList()?.let { dates ->
+
+        lastDates.toList().let { dates ->
             SharedPrefsManager.putList<DateLastSavedStatsModel>(
                 dates,
                 R.string.prefs_last_fetched_date.asString()
