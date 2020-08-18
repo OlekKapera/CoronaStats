@@ -6,18 +6,16 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
-import android.os.Message
-import android.os.Messenger
-import android.os.RemoteException
-import android.util.Log
+import android.os.Build
 import android.widget.RemoteViews
 import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
 import com.aleksanderkapera.covidstats.service.WidgetIntentService
-import com.aleksanderkapera.covidstats.util.*
+import com.aleksanderkapera.covidstats.util.DateStandardConverter
+import com.aleksanderkapera.covidstats.util.SERVICE_WIDGET_INTENT
+import com.aleksanderkapera.covidstats.util.SharedPrefsManager
+import com.aleksanderkapera.covidstats.util.asString
 
 /**
  * Implementation of App Widget functionality.
@@ -25,22 +23,6 @@ import com.aleksanderkapera.covidstats.util.*
 class LatestStatsWidget : AppWidgetProvider() {
 
     private var statistic: AllStatusStatisticTable? = null
-    private var mService: Messenger? = null
-    private var isBound: Boolean = true
-
-    private val mConnection = object : ServiceConnection {
-        override fun onServiceDisconnected(className: ComponentName?) {
-            Log.d(LatestStatsWidget::class.simpleName, "Service disconnected")
-            mService = null
-            isBound = false
-        }
-
-        override fun onServiceConnected(className: ComponentName?, service: IBinder?) {
-            Log.d(LatestStatsWidget::class.simpleName, "Service connected")
-            mService = Messenger(service)
-            isBound = true
-        }
-    }
 
     override fun onUpdate(
         context: Context,
@@ -79,9 +61,6 @@ class LatestStatsWidget : AppWidgetProvider() {
             context.packageName,
             R.layout.widget_latest_stats
         )
-//        Intent(context, WidgetService::class.java).also { intent ->
-//            context.applicationContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
-//        }
 
         statistic?.let {
             views.apply {
@@ -110,16 +89,6 @@ class LatestStatsWidget : AppWidgetProvider() {
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 
-    private fun callRefreshService() {
-        if (!isBound) return
-        val msg: Message = Message.obtain(null, MSG_REFRESH_WIDGET, 0, 0)
-        try {
-            mService?.send(msg)
-        } catch (e: RemoteException) {
-            e.printStackTrace()
-        }
-    }
-
     private fun startService(context: Context, id: Int, countryCode: String): PendingIntent {
 //        val intent = Intent(context, WidgetIntentService::class.java)
 //        intent.action = SERVICE_WIDGET_INTENT
@@ -138,8 +107,12 @@ class LatestStatsWidget : AppWidgetProvider() {
                 "com.aleksanderkapera.covidstats.service.WidgetIntentService"
             )
         }
-//        WidgetIntentService.enqueueWork(context.applicationContext, intent)
-        return PendingIntent.getForegroundService(context, id, intent, 0)
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            PendingIntent.getForegroundService(context, id, intent, 0)
+        } else {
+            PendingIntent.getService(context, id, intent, 0)
+        }
     }
 
     companion object {
