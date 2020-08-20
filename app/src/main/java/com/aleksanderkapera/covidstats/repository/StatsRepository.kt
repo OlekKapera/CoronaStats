@@ -92,6 +92,8 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
                     }
 
                 }
+            } catch (t: Throwable) {
+                throw t
             } finally {
                 if (userCountries != null) {
                     val todayStats = updateTodayStats(userCountries)
@@ -104,7 +106,7 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
     /**
      * Retrieves all stats from countries from day one
      */
-    suspend fun getStats(countries: List<Country>?) {
+    private suspend fun getStats(countries: List<Country>?) {
         withContext(Dispatchers.Unconfined + NonCancellable) {
             val newStats: List<List<AllStatusStatisticNetwork>>?
             val deferredStats: MutableList<Deferred<List<AllStatusStatisticNetwork>>> =
@@ -136,7 +138,7 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
     /**
      * Retrieves overall statistics reported in [country] from yesterday's stats
      */
-    suspend fun getStatsByTime(
+    private suspend fun getStatsByTime(
         countries: List<Country>,
         from: DateTime,
         to: DateTime
@@ -165,7 +167,6 @@ class StatsRepository private constructor(private val database: StatsDatabase) {
                     val newStatsDatabase = newStats.asDatabaseModel()
                     database.statsDao().insertStatistic(*newStatsDatabase)
                 }
-//                updateLastFetchedDate(newStats)
             }
         }
     }

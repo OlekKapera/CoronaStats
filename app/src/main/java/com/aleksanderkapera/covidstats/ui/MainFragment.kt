@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.aleksanderkapera.covidstats.CovidStatsApp
 import com.aleksanderkapera.covidstats.R
 import com.aleksanderkapera.covidstats.databinding.FragmentMainBinding
+import com.aleksanderkapera.covidstats.domain.AllStatusStatistic
 import com.aleksanderkapera.covidstats.domain.Country
 import com.aleksanderkapera.covidstats.ui.adapter.LatestStatsAdapter
 import com.aleksanderkapera.covidstats.util.InjectorUtils
@@ -107,14 +108,14 @@ class MainFragment : Fragment() {
 
     private fun initObservers() {
         mainViewModel.userCountries.observe(viewLifecycleOwner, Observer {
-            mainViewModel.updateTodayStats()
+            updateAdapterData(mainViewModel.todayStats.value)
         })
 
         chooseCountryDialogViewModel.onPositiveButtonClickEvent.observe(
             viewLifecycleOwner,
             Observer { isClicked ->
                 if (isClicked) {
-                    mainViewModel.updateStats()
+                    mainViewModel.updateStats(chooseCountryDialogViewModel.clickedCountries.value?.toList())
                     chooseCountryDialogViewModel.finishOnPositiveButtonClick()
                 }
             })
@@ -131,19 +132,18 @@ class MainFragment : Fragment() {
         })
 
         mainViewModel.todayStats.observe(viewLifecycleOwner, Observer { todayStats ->
-            recyclerAdapter.todayStats =
-                todayStats.filter { mainViewModel.userCountries.value?.contains(it.country) == true }
-            recyclerAdapter.notifyDataSetChanged()
-
-            mainViewModel.updateLastFetchedDate()
-        })
-
-        mainViewModel.statistics.observe(viewLifecycleOwner, Observer {
-            mainViewModel.updateTodayStats()
+            updateAdapterData(todayStats)
         })
 
         mainViewModel.loadingEvent.observe(viewLifecycleOwner, Observer { isLoading ->
             mainFragment_refresh.isRefreshing = isLoading
         })
+    }
+
+    private fun updateAdapterData(todayStats: List<AllStatusStatistic>?) {
+        recyclerAdapter.todayStats =
+            todayStats?.filter { mainViewModel.userCountries.value?.contains(it.country) == true }
+                ?: listOf()
+        recyclerAdapter.notifyDataSetChanged()
     }
 }

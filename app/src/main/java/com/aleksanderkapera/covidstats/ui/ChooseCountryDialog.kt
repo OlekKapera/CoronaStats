@@ -73,19 +73,11 @@ class ChooseCountryDialog(private val mode: Mode) : DialogFragment() {
                     SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
                         viewModel.getCountriesByName(query ?: "")
-
-                        if (query.isNullOrEmpty())
-                            viewModel.hintCountries
-
                         return true
                     }
 
                     override fun onQueryTextChange(query: String?): Boolean {
                         viewModel.getCountriesByName(query ?: "")
-
-                        if (query.isNullOrEmpty())
-                            viewModel.hintCountries
-
                         return true
                     }
                 })
@@ -101,8 +93,8 @@ class ChooseCountryDialog(private val mode: Mode) : DialogFragment() {
                             hintsAdapter.clickedCountries.value?.toList() ?: listOf(),
                             R.string.prefs_chosen_countries.asString()
                         )
-//                        viewModel.updateStats()
                         viewModel.onPositiveButtonClick()
+                        dialogInterface.cancel()
                         resetHints()
                     })
                     .setNegativeButton(
