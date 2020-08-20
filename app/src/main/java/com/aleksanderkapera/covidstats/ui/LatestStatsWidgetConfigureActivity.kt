@@ -9,9 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.aleksanderkapera.covidstats.CovidStatsApp.Companion.context
 import com.aleksanderkapera.covidstats.R
-import com.aleksanderkapera.covidstats.domain.asDatabaseModel
 import com.aleksanderkapera.covidstats.room.AllStatusStatisticTable
-import com.aleksanderkapera.covidstats.room.asDomainModel
 import com.aleksanderkapera.covidstats.util.InjectorUtils
 import com.aleksanderkapera.covidstats.util.SharedPrefsManager
 import com.aleksanderkapera.covidstats.util.asString
@@ -60,17 +58,13 @@ class LatestStatsWidgetConfigureActivity : AppCompatActivity() {
                         updateWidgetSharedPrefs(countryToDisplay)
                     else {
                         withContext(Dispatchers.Default) {
-                            updateWidgetSharedPrefs(
-                                viewModel.fetchNewCountry(
-                                    latestStats.map {
-                                        it.asDomainModel(
-                                            InjectorUtils.getStatsDatabase(
-                                                context
-                                            )
-                                        )
-                                    }
-                                )?.asDatabaseModel()
-                            )
+                            viewModel.clickedCountries.value?.first()?.let { newCountry ->
+                                viewModel.fetchNewCountry(newCountry)
+                                updateWidgetSharedPrefs(
+                                    SharedPrefsManager.getList<AllStatusStatisticTable>(R.string.prefs_latest_stats.asString())
+                                        ?.find { it.countryCode == newCountry.iso2 }
+                                )
+                            }
                         }
                     }
                     LatestStatsWidget.sendRefreshWidgetIntent()
